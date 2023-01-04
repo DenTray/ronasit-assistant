@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ronas_assistant">
+    package="com.example.ronas_it_assistant">
    <application
-        android:label="ronas_assistant"
+        android:label="ronas_it_assistant"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

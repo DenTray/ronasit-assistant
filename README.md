@@ -1,6 +1,6 @@
-# ronas_assistant
+# ronas_it_assistant
 
-App to work with the RonasIT API
+A new Flutter project.
 
 ## Getting Started
 

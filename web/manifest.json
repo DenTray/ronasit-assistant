@@ -1,11 +1,11 @@
 {
-    "name": "ronas_assistant",
-    "short_name": "ronas_assistant",
+    "name": "ronas_it_assistant",
+    "short_name": "ronas_it_assistant",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "App to work with the RonasIT API",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
