@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:ronas_assistant/src/resources/ronas_it_api_provider.dart';
+import 'package:ronas_assistant/src/blocs/introduce/introduce_bloc.dart';
+import 'package:ronas_assistant/src/blocs/introduce/introduce_state.dart';
+import 'package:ronas_assistant/src/blocs/introduce/events/login_event.dart';
+import 'package:ronas_assistant/src/blocs/introduce/events/update_username_event.dart';
+import 'package:ronas_assistant/src/blocs/introduce/events/update_last_name_event.dart';
+import 'package:ronas_assistant/src/blocs/introduce/events/update_first_name_event.dart';
+import 'package:ronas_assistant/src/blocs/introduce/events/edit_username_mode_update_event.dart';
 
 class Introduce extends StatefulWidget {
   const Introduce({Key? key}) : super(key: key);
@@ -11,166 +17,95 @@ class Introduce extends StatefulWidget {
 }
 
 class _IntroduceState extends State<Introduce> {
-  String _firstNameInput = '';
-  String _lastNameInput = '';
-  String _userName = '';
-
-  String _authError = '';
-
-  bool _isUsernameEditMode = false;
-  bool _isCompleteButtonEnable = false;
-
-  _firstNameInputChanged(input) {
-    setState(() {
-      _firstNameInput = input;
-
-      _updateUsername(null);
-    });
-  }
-
-  _lastNameInputChanged(input) {
-    setState(() {
-      _lastNameInput = input;
-
-      _updateUsername(null);
-    });
-  }
-
-  _updateUsername(value) {
-    value = value ?? generateUsername();
-
-    _userName = value;
-
-    _updateCompleteButtonEnable();
-  }
-
-  _updateCompleteButtonEnable() {
-    _isCompleteButtonEnable = _userName.length > 3 && _authError.isEmpty;
-  }
-
-  _changeUsername() {
-    setState(() {
-      _isUsernameEditMode = true;
-    });
-  }
-
-  _saveUsername() {
-    setState(() {
-      _isUsernameEditMode = false;
-    });
-  }
-
-  _saveData() async {
-    if (_isCompleteButtonEnable) {
-      setState(() {
-        _isCompleteButtonEnable = false;
-      });
-
-      RonasITApiProvider api = RonasITApiProvider.getInstance();
-
-      try {
-        await api.fetchTime(_userName);
-
-        final preferences = await SharedPreferences.getInstance();
-
-        await preferences.setString('user.first_name', _firstNameInput);
-        await preferences.setString('user.last_name', _lastNameInput);
-        await preferences.setString('user.username', _userName);
-
-        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
-      } catch (error) {
-        setState(() {
-          _authError = '${AppLocalizations.of(context)!.messageUser} $_userName ${AppLocalizations.of(context)!.messageDoesNotExists}';
-        });
-      }
-    }
-  }
-
-  generateUsername() {
-    String firstLatter = (_firstNameInput.isNotEmpty) ? _firstNameInput.characters.first.toLowerCase() : '';
-
-    return '$firstLatter${_lastNameInput.toLowerCase()}';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarAuthorization), centerTitle: true),
-      body: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+    return BlocProvider(
+      create: (_) => IntroduceBloc(),
+      child: BlocBuilder<IntroduceBloc, IntroduceState>(builder: (context, state) {
+        return  Scaffold(
+          appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarAuthorization), centerTitle: true),
+          body: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('${AppLocalizations.of(context)!.textEnterName}:')
-                  ]
-                ),
-                const Padding(padding: EdgeInsets.only(top: 20)),
-                Row(
-                  children: [
-                    SizedBox(width: 200, child: TextFormField(
-                      textCapitalization: TextCapitalization.words,
-                      autocorrect: false,
-                      onChanged: _firstNameInputChanged,
-                      decoration: InputDecoration(border: const UnderlineInputBorder(), labelText: AppLocalizations.of(context)!.placeholderEnterName)
-                    ))
-                  ]
-                ),
-                Row(
-                  children: [
-                    SizedBox(width: 200, child: TextFormField(
-                      textCapitalization: TextCapitalization.words,
-                      autocorrect: false,
-                      onChanged: _lastNameInputChanged,
-                      decoration: InputDecoration(border: const UnderlineInputBorder(), labelText: AppLocalizations.of(context)!.placeholderEnterLastName)
-                    ))
-                  ]
-                ),
-                const Padding(padding: EdgeInsets.only(top: 20)),
-                Row(
-                  children: [
-                    Text('${AppLocalizations.of(context)!.textSetUsername}:')
-                  ]
-                ),
-                Row(
-                  children: [
-                    Visibility(visible: !_isUsernameEditMode, child: Text(_userName)),
-                    Visibility(visible: !_isUsernameEditMode, child: IconButton(splashRadius: 2, onPressed: _changeUsername, icon: const Icon(Icons.edit, size: 15))),
-                    Visibility(visible: _isUsernameEditMode, child: SizedBox(width: 150, child: TextFormField(
-                      autocorrect: false,
-                      initialValue: _userName,
-                      decoration: InputDecoration(border: const UnderlineInputBorder(), labelText: AppLocalizations.of(context)!.placeholderEnterUsername),
-                      onChanged: (input) {
-                        setState(() {
-                          _authError = '';
-                          _updateUsername(input);
-                          _updateCompleteButtonEnable();
-                        });
-                      },
-                    ))),
-                    Visibility(visible: _isUsernameEditMode, child: IconButton( splashRadius: 2, onPressed: _saveUsername, icon: const Icon(Icons.save, size: 15)))
-                  ]
-                ),
-                Visibility(visible: _authError.isNotEmpty, child: Text(_authError, style: const TextStyle(fontSize: 12, color: Colors.red))),
-                const Padding(padding: EdgeInsets.only(top: 20)),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: _saveData,
-                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(_isCompleteButtonEnable ? Colors.blue : Colors.grey)),
-                      child: Text(AppLocalizations.of(context)!.buttonComplete)
-                    )
+                    const SizedBox(height: 20),
+                    Row(children: [
+                      Text('${AppLocalizations.of(context)!.textEnterName}:')
+                    ]),
+                    const Padding(padding: EdgeInsets.only(top: 20)),
+                    input(AppLocalizations.of(context)!.placeholderEnterName, (input) {
+                      context.read<IntroduceBloc>().add(UpdateFirstNameEvent(input));
+                    }),
+                    input(AppLocalizations.of(context)!.placeholderEnterLastName, (input) {
+                      context.read<IntroduceBloc>().add(UpdateLastNameEvent(input));
+                    }),
+                    const Padding(padding: EdgeInsets.only(top: 20)),
+                    Row(
+                      children: [
+                        Text('${AppLocalizations.of(context)!.textSetUsername}:')
+                      ]
+                    ),
+                    Row(
+                      children: [
+                        Visibility(visible: !state.isEditUserNameModeEnabled, child: Text(state.userName)),
+                        Visibility(visible: !state.isEditUserNameModeEnabled, child: IconButton(splashRadius: 2, icon: const Icon(Icons.edit, size: 15), onPressed: () {
+                          context.read<IntroduceBloc>().add(EditUsernameModeUpdate(true));
+                        })),
+                        Visibility(visible: state.isEditUserNameModeEnabled, child: SizedBox(width: 150, child: TextFormField(
+                          autocorrect: false,
+                          initialValue: state.userName,
+                          decoration: InputDecoration(border: const UnderlineInputBorder(), labelText: AppLocalizations.of(context)!.placeholderEnterUsername),
+                          onChanged: (input) {
+                            context.read<IntroduceBloc>().add(UpdateUsernameEvent(input));
+                          },
+                        ))),
+                        Visibility(visible: state.isEditUserNameModeEnabled, child: IconButton( splashRadius: 2, icon: const Icon(Icons.save, size: 15), onPressed: () {
+                          context.read<IntroduceBloc>().add(EditUsernameModeUpdate(false));
+                        }))
+                      ]
+                    ),
+                    Visibility(visible: state.authError == 'not_exists', child: Text('${AppLocalizations.of(context)!.messageUser} ${state.userName} ${AppLocalizations.of(context)!.messageDoesNotExists}', style: const TextStyle(fontSize: 12, color: Colors.red))),
+                    const Padding(padding: EdgeInsets.only(top: 20)),
+                    loginButton(state.isLoginButtonEnabled, context)
                   ]
                 )
               ]
             )
-          ]
+          )
+        );
+      })
+    );
+  }
+
+  Widget loginButton(isLoginButtonEnabled, context) {
+    return Row(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            if (isLoginButtonEnabled) {
+              context.read<IntroduceBloc>().add(LoginEvent(context));
+            }
+          },
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(isLoginButtonEnabled ? Colors.blue : Colors.grey)),
+          child: Text(AppLocalizations.of(context)!.buttonComplete)
         )
-      )
+      ]
+    );
+  }
+
+  Widget input(String label, onChangeCallback) {
+    return Row(
+      children: [
+        SizedBox(width: 200, child: TextFormField(
+          textCapitalization: TextCapitalization.words,
+          autocorrect: false,
+          onChanged: onChangeCallback,
+          decoration: InputDecoration(border: const UnderlineInputBorder(), labelText: label)
+        ))
+      ]
     );
   }
 }
