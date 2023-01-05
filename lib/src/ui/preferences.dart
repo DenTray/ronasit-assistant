@@ -25,25 +25,25 @@ class _PreferencesState extends State<Preferences> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => SettingsBlock()..add(GetSettingsEvent()),
-      child: BlocBuilder<SettingsBlock, SettingsState>(
+      create: (_) => SettingsBloc()..add(GetSettingsEvent()),
+      child: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarPreferences), centerTitle: true),
             body: Column(children: [
               const Padding(padding: EdgeInsets.only(top: 20)),
-              prefferedWorkingDaysCountSetting(state.workingDaysCount, (int selectedItem) => context.read<SettingsBlock>().add(UpdateWorkingDaysCountEvent(selectedItem + 1))),
+              prefferedWorkingDaysCountSetting(state.workingDaysCount, (int selectedItem) => context.read<SettingsBloc>().add(UpdateWorkingDaysCountEvent(selectedItem + 1))),
               languageSetting(state.locale, (int index) {
-                context.read<SettingsBlock>().add(UpdateLocaleEvent(_locales[index]));
+                context.read<SettingsBloc>().add(UpdateLocaleEvent(_locales[index]));
                 _showChangeLocaleDialog();
               }),
               rateSetting(
                 state.rate,
                 (int index) {
-                  context.read<SettingsBlock>().add(UpdateRateEvent(index.toString(), null));
+                  context.read<SettingsBloc>().add(UpdateRateEvent(index.toString(), null));
                 },
                 (int index) {
-                  context.read<SettingsBlock>().add(UpdateRateEvent(null, index.toString()));
+                  context.read<SettingsBloc>().add(UpdateRateEvent(null, index.toString()));
                 }
               )
             ])

@@ -25,8 +25,8 @@ class _StatsState extends State<Stats> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => StatisticBlock()..add(FetchStatisticEvent()),
-      child: BlocBuilder<StatisticBlock, StatisticState>(
+      create: (_) => StatisticBloc()..add(FetchStatisticEvent()),
+      child: BlocBuilder<StatisticBloc, StatisticState>(
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarStats)),
@@ -34,19 +34,16 @@ class _StatsState extends State<Stats> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                RemainModeSwitcher([
-                  !state.isRemainModeEnabled,
-                  state.isRemainModeEnabled
-                ], (int index) {
-                  context.read<StatisticBlock>().add(SetRemainModeEvent(index == 1));
+                remainModeSwitcher([!state.isRemainModeEnabled, state.isRemainModeEnabled], (int index) {
+                  context.read<StatisticBloc>().add(SetRemainModeEvent(index == 1));
                 }),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                ContributionRequiredLabel(state.isContributionRequired),
+                contributionRequiredLabel(state.isContributionRequired),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-                (state.statistic == null) ? const CircularProgressIndicator() : StatsBlock(state),
+                (state.statistic == null) ? const CircularProgressIndicator() : statsBlock(state),
                 const Padding(padding: EdgeInsets.only(top: 50)),
-                RefreshButtonLine(state.isLoading, state.refreshIconAngle, () {
-                  context.read<StatisticBlock>().add(RefreshStatisticEvent());
+                refreshButtonLine(state.isLoading, state.refreshIconAngle, () {
+                  context.read<StatisticBloc>().add(RefreshStatisticEvent());
                 })
               ]
             )
@@ -56,7 +53,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget StatsBlock(StatisticState state) {
+  Widget statsBlock(StatisticState state) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -104,18 +101,18 @@ class _StatsState extends State<Stats> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            CompleteIcon(state.todayTime.gte(state.dayPlan.toDouble())),
+            completeIcon(state.todayTime.gte(state.dayPlan.toDouble())),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            CompleteIcon(state.weekTime.gte(state.weekPlan.toDouble())),
+            completeIcon(state.weekTime.gte(state.weekPlan.toDouble())),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            CompleteIcon(state.monthTime.gte(state.monthPlan.toDouble()))
+            completeIcon(state.monthTime.gte(state.monthPlan.toDouble()))
           ]
         )
       ]
     );
   }
 
-  Widget RemainModeSwitcher(List<bool> isSelected, void Function(int) onSwitchCallback) {
+  Widget remainModeSwitcher(List<bool> isSelected, void Function(int) onSwitchCallback) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -138,7 +135,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget ContributionRequiredLabel(bool shouldBeDisplayed) {
+  Widget contributionRequiredLabel(bool shouldBeDisplayed) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -154,7 +151,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget RefreshButtonLine(bool isProcessing, iconAngle, callback) {
+  Widget refreshButtonLine(bool isProcessing, iconAngle, callback) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,7 +161,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget CompleteIcon(bool isVisible) {
+  Widget completeIcon(bool isVisible) {
     return Opacity(
       opacity: (isVisible) ? 1 : 0,
       child: const Icon(Icons.done, color: Colors.lightGreen)

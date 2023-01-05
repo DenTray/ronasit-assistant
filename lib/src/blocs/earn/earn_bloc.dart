@@ -10,14 +10,14 @@ import 'package:ronas_assistant/src/blocs/earn/events/base_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/fetch_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/refresh_earn_event.dart';
 
-class EarnBlock extends Bloc<BaseEarnEvent, EarnState> {
+class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
   final _userRepository = UserRepository.getInstance();
   final _settingsRepository = SettingsRepository.getInstance();
   final _statisticRepository = StatisticRepository.getInstance();
 
   bool isLoading = false;
 
-  EarnBlock() : super(EarnState()) {
+  EarnBloc() : super(EarnState()) {
     on<FetchEarnEvent>((event, emit) async {
       runRefreshIconRotation();
 
