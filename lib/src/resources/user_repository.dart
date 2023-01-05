@@ -15,6 +15,14 @@ class UserRepository {
     );
   }
 
+  Future removeUser() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    await preferences.remove('user.first_name');
+    await preferences.remove('user.last_name');
+    await preferences.remove('user.username');
+  }
+
   factory UserRepository.getInstance() => _instance ??= UserRepository._internal();
 
   UserRepository._internal();

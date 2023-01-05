@@ -11,14 +11,14 @@ import 'package:ronas_assistant/src/blocs/stats/events/fetch_statistic_event.dar
 import 'package:ronas_assistant/src/blocs/stats/events/set_remain_mode_event.dart';
 import 'package:ronas_assistant/src/blocs/stats/events/refresh_statistic_event.dart';
 
-class StatisticBlock extends Bloc<BaseStatisticEvent, StatisticState> {
+class StatisticBloc extends Bloc<BaseStatisticEvent, StatisticState> {
   final _userRepository = UserRepository.getInstance();
   final _settingsRepository = SettingsRepository.getInstance();
   final _statisticRepository = StatisticRepository.getInstance();
 
   bool isLoading = false;
 
-  StatisticBlock() : super(StatisticState()) {
+  StatisticBloc() : super(StatisticState()) {
     on<FetchStatisticEvent>((event, emit) async {
       runRefreshIconRotation();
 

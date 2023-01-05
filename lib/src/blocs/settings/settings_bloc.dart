@@ -8,10 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../resources/settings_repository.dart';
 import './events/update_working_days_count_event.dart';
 
-class SettingsBlock extends Bloc<BaseSettingsEvent, SettingsState> {
+class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
   final _repository = SettingsRepository.getInstance();
 
-  SettingsBlock() : super(SettingsState(null)) {
+  SettingsBloc() : super(SettingsState(null)) {
     on<GetSettingsEvent>((event, emit) async {
       Settings settings = await _repository.getSettings();
       SettingsState state = SettingsState(settings);

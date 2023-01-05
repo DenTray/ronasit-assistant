@@ -21,8 +21,8 @@ class _EarnState extends State<Earn> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => EarnBlock()..add(FetchEarnEvent()),
-      child: BlocBuilder<EarnBlock, EarnState>(
+      create: (_) => EarnBloc()..add(FetchEarnEvent()),
+      child: BlocBuilder<EarnBloc, EarnState>(
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarStats)),
@@ -74,7 +74,7 @@ class _EarnState extends State<Earn> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    RefreshButton(callback: () => context.read<EarnBlock>().add(RefreshEarnEvent()), isProcessing: state.isLoading, refreshIconAngle: state.refreshIconAngle)
+                    RefreshButton(callback: () => context.read<EarnBloc>().add(RefreshEarnEvent()), isProcessing: state.isLoading, refreshIconAngle: state.refreshIconAngle)
                   ]
                 )
               ]
