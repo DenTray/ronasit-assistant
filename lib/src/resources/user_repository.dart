@@ -15,6 +15,14 @@ class UserRepository {
     );
   }
 
+  Future setUser(String firstName, String lastName, String userName) async {
+    final preferences = await SharedPreferences.getInstance();
+
+    await preferences.setString('user.first_name', firstName);
+    await preferences.setString('user.last_name', lastName);
+    await preferences.setString('user.username', userName);
+  }
+
   Future removeUser() async {
     final preferences = await SharedPreferences.getInstance();
 
