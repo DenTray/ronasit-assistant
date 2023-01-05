@@ -69,23 +69,7 @@ class _IntroduceState extends State<Introduce> {
                     ),
                     Visibility(visible: state.authError == 'not_exists', child: Text('${AppLocalizations.of(context)!.messageUser} ${state.userName} ${AppLocalizations.of(context)!.messageDoesNotExists}', style: const TextStyle(fontSize: 12, color: Colors.red))),
                     const Padding(padding: EdgeInsets.only(top: 20)),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            if (state.isLoginButtonEnabled) {
-                              context.read<IntroduceBloc>().add(LoginEvent(context));
-
-                              // context.read<IntroduceBloc>().add(LoginEvent(onSuccessCallback: () {
-                              //   Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
-                              // }));
-                            }
-                          },
-                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(state.isLoginButtonEnabled ? Colors.blue : Colors.grey)),
-                          child: Text(AppLocalizations.of(context)!.buttonComplete)
-                        )
-                      ]
-                    )
+                    loginButton(state.isLoginButtonEnabled, context)
                   ]
                 )
               ]
@@ -93,6 +77,22 @@ class _IntroduceState extends State<Introduce> {
           )
         );
       })
+    );
+  }
+
+  Widget loginButton(isLoginButtonEnabled, context) {
+    return Row(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            if (isLoginButtonEnabled) {
+              context.read<IntroduceBloc>().add(LoginEvent(context));
+            }
+          },
+          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(isLoginButtonEnabled ? Colors.blue : Colors.grey)),
+          child: Text(AppLocalizations.of(context)!.buttonComplete)
+        )
+      ]
     );
   }
 
