@@ -45,6 +45,7 @@ dependencies:
   rxdart: ^0.27.5
   bloc: ^8.1.0
   flutter_bloc: ^8.1.1
+  shimmer: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -8,7 +8,6 @@ import 'package:ronas_assistant/src/ui/base_view.dart';
 import 'package:ronas_assistant/src/ui/preferences.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:ronas_assistant/src/ui/full_screen_avatar.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class App extends StatelessWidget {
@@ -53,7 +52,6 @@ class App extends StatelessWidget {
           '/start': (context) => const Start(),
           '/stats': (context) => const Stats(),
           '/profile': (context) => const Profile(),
-          '/avatar': (context) => const Avatar(),
           '/main': (context) => const Base(),
           '/preferences': (context) => const Preferences(),
         }
