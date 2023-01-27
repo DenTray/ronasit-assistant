@@ -1,3 +1,5 @@
+import 'package:ronas_assistant/src/support/helpers.dart';
+
 class Report {
   late String _user;
   late String _source;
@@ -11,7 +13,7 @@ class Report {
     _source = parsedJson['source'];
     _project = parsedJson['project'];
     _date = parsedJson['date'];
-    _hours = parsedJson['hours'];
+    _hours = Helpers.convertToDouble(parsedJson['hours']);
     _assignmentName = parsedJson['assignment_name'];
   }
 

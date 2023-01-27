@@ -69,7 +69,11 @@ class _IntroduceState extends State<Introduce> {
                     ),
                     Visibility(visible: state.authError == 'not_exists', child: Text('${AppLocalizations.of(context)!.messageUser} ${state.userName} ${AppLocalizations.of(context)!.messageDoesNotExists}', style: const TextStyle(fontSize: 12, color: Colors.red))),
                     const Padding(padding: EdgeInsets.only(top: 20)),
-                    loginButton(state.isLoginButtonEnabled, context)
+                    loginButton(state.isLoginButtonEnabled, () {
+                      if (state.isLoginButtonEnabled) {
+                        context.read<IntroduceBloc>().add(LoginEvent(context));
+                      }
+                    })
                   ]
                 )
               ]
@@ -80,15 +84,11 @@ class _IntroduceState extends State<Introduce> {
     );
   }
 
-  Widget loginButton(isLoginButtonEnabled, context) {
+  Widget loginButton(isLoginButtonEnabled, onPressedCallback) {
     return Row(
       children: [
         ElevatedButton(
-          onPressed: () {
-            if (isLoginButtonEnabled) {
-              context.read<IntroduceBloc>().add(LoginEvent(context));
-            }
-          },
+          onPressed: onPressedCallback,
           style: ButtonStyle(backgroundColor: MaterialStateProperty.all(isLoginButtonEnabled ? Colors.blue : Colors.grey)),
           child: Text(AppLocalizations.of(context)!.buttonComplete)
         )

@@ -47,3 +47,9 @@ app.*.map.json
 /android/app/release
 
 /lib/auth/secrets.dart
+
+# Runners
+/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+/ios/Runner.xcodeproj/project.pbxproj
+/macos/Runner.xcodeproj/project.pbxproj
+/macos/Runner.xcworkspace/contents.xcworkspacedata
