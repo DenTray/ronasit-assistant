@@ -1,4 +1,5 @@
 import './shared/refresh_button.dart';
+import './../support/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import './shared/cupertino_dialog.dart';
@@ -30,79 +31,23 @@ class _EarnState extends State<Earn> {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton(
-                  onPressed: () => _showCupertinoDialog(
-                    CupertinoDialog(
-                      fontSize: 15,
-                      items: state.currenciesNames!,
-                      currentItem: state.currency?.name,
-                      onSelectedItemChangedCallback: (index) {
-                        context.read<EarnBloc>().add(ChangeCurrencyEvent(index));
-                      }
-                    )
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                    fixedSize: MaterialStateProperty.all(const Size.fromWidth(260))
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: AutoSizeText.rich(
-                        TextSpan(text: state.currency?.name ?? ''),
-                        style: const TextStyle(fontSize: 15),
-                        minFontSize: 1,
-                        maxLines: 1,
-                      )),
-                      Text('(${state.quote.toStringAsFixed(2)})'),
-                      const Icon(Icons.arrow_drop_down),
-                    ]
-                  )
+                chooseCurrencyButton(
+                  state.currency?.name ?? '',
+                  state.quote,
+                  () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
+                    fontSize: 15,
+                    items: state.currenciesNames!,
+                    currentItem: state.currency?.name,
+                    onSelectedItemChangedCallback: (index) {
+                      context.read<EarnBloc>().add(ChangeCurrencyEvent(index));
+                    }
+                  ))
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${AppLocalizations.of(context)!.textToday}:'),
-                        const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-                        Text('${AppLocalizations.of(context)!.textWeek}:'),
-                        const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-                        Text('${AppLocalizations.of(context)!.textMonth}:')
-                      ],
-                    ),
-                    const Padding(padding: EdgeInsets.only(left: 20, right: 20)),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          state.formattedTodayEarned,
-                          style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black)
-                        ),
-                        const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-                        Text(
-                          state.formattedWeekEarned,
-                          style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black)
-                        ),
-                        const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-                        Text(
-                          state.formattedMonthEarned,
-                          style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black)
-                        )
-                      ]
-                    )
-                  ]
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    RefreshButton(callback: () => context.read<EarnBloc>().add(RefreshEarnEvent()), isProcessing: state.isLoading, refreshIconAngle: state.refreshIconAngle)
-                  ]
+                earnContent(state.isLoading, state.formattedTodayEarned, state.formattedWeekEarned, state.formattedMonthEarned),
+                refreshButton(
+                  state.isLoading,
+                  state.refreshIconAngle,
+                  () => context.read<EarnBloc>().add(RefreshEarnEvent())
                 )
               ]
             )
@@ -111,18 +56,82 @@ class _EarnState extends State<Earn> {
       )
     );
   }
-//TODO move to component
-  void _showCupertinoDialog(Widget child, { height = 200.0 }) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          height: height,
-          padding: const EdgeInsets.only(top: 6.0),
-          margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SafeArea(top: false, child: child)
-        );
-      }
+
+  Widget chooseCurrencyButton(String currencyName, double quote, callback) {
+    return ElevatedButton(
+      onPressed: callback,
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.blue),
+        fixedSize: MaterialStateProperty.all(const Size.fromWidth(260))
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: AutoSizeText.rich(
+              TextSpan(text: currencyName),
+              style: const TextStyle(fontSize: 15),
+              minFontSize: 1,
+              maxLines: 1,
+            )
+          ),
+          Text('(${quote.toStringAsFixed(2)})'),
+          const Icon(Icons.arrow_drop_down)
+        ]
+      )
+    );
+  }
+
+  Widget refreshButton(bool isLoading, double refreshIconAngle, callback) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        RefreshButton(
+          callback: callback,
+          isProcessing: isLoading,
+          refreshIconAngle: refreshIconAngle
+        )
+      ]
+    );
+  }
+
+  Widget earnContent(bool isLoading, String todayEarned, String weekEarned, String monthEarned) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${AppLocalizations.of(context)!.textToday}:'),
+            const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+            Text('${AppLocalizations.of(context)!.textWeek}:'),
+            const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+            Text('${AppLocalizations.of(context)!.textMonth}:')
+          ],
+        ),
+        const Padding(padding: EdgeInsets.only(left: 20, right: 20)),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            amount(isLoading, todayEarned),
+            const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+            amount(isLoading, weekEarned),
+            const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
+            amount(isLoading, monthEarned)
+          ]
+        )
+      ]
+    );
+  }
+
+  Widget amount(bool isLoading, String formatterAmount) {
+    return Text(
+      formatterAmount,
+      style: TextStyle(color: (isLoading) ? Colors.grey : Colors.black)
     );
   }
 }

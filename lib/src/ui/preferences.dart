@@ -1,3 +1,4 @@
+import '../support/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import './shared/cupertino_dialog.dart';
@@ -67,7 +68,8 @@ class _PreferencesState extends State<Preferences> {
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Text(currentValue.toString(), style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => _showCupertinoDialog(
+          onPressed: () => UIHelpers.displayCupertinoDialog(
+            context,
             CupertinoDialog(
               items: _daysCount,
               currentItem: currentValue,
@@ -89,7 +91,8 @@ class _PreferencesState extends State<Preferences> {
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Text(currentValue, style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => _showCupertinoDialog(
+          onPressed: () => UIHelpers.displayCupertinoDialog(
+            context,
             CupertinoDialog(
               items: _currencies,
               currentItem: currentValue,
@@ -111,7 +114,8 @@ class _PreferencesState extends State<Preferences> {
         CupertinoButton(
           padding: EdgeInsets.zero,
           child: Text(currentValue, style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => _showCupertinoDialog(
+          onPressed: () => UIHelpers.displayCupertinoDialog(
+            context,
             CupertinoDialog(
               items: _locales,
               currentItem: currentValue,
@@ -132,7 +136,8 @@ class _PreferencesState extends State<Preferences> {
         const Spacer(),
         CupertinoButton(
           child: Text(currentValue.toString()),
-          onPressed: () => _showCupertinoDialog(
+          onPressed: () => UIHelpers.displayCupertinoDialog(
+            context,
             height: 500.0,
             Container(
               height: 300.0,
@@ -188,20 +193,6 @@ class _PreferencesState extends State<Preferences> {
           )
         ]
       )
-    );
-  }
-
-  void _showCupertinoDialog(Widget child, { height = 200.0 }) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          height: height,
-          padding: const EdgeInsets.only(top: 6.0),
-          margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SafeArea(top: false, child: child)
-        );
-      }
     );
   }
 }
