@@ -9,6 +9,7 @@ import 'package:ronas_assistant/src/blocs/settings/settings_state.dart';
 import 'package:ronas_assistant/src/blocs/settings/events/update_rate_event.dart';
 import 'package:ronas_assistant/src/blocs/settings/events/get_settings_event.dart';
 import 'package:ronas_assistant/src/blocs/settings/events/update_locale_event.dart';
+import 'package:ronas_assistant/src/blocs/settings/events/update_rate_currency_event.dart';
 import 'package:ronas_assistant/src/blocs/settings/events/update_working_days_count_event.dart';
 
 class Preferences extends StatefulWidget {
@@ -21,6 +22,7 @@ class Preferences extends StatefulWidget {
 class _PreferencesState extends State<Preferences> {
   final List <int> _daysCount = <int> [1, 2, 3, 4, 5, 6, 7];
   final List <String> _locales = <String> ['en', 'ru'];
+  final List <String> _currencies = <String> ['\$', '₽'];
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,10 @@ class _PreferencesState extends State<Preferences> {
                 (int index) {
                   context.read<SettingsBloc>().add(UpdateRateEvent(null, index.toString()));
                 }
-              )
+              ),
+              currencySetting(state.rateCurrency, (index) {
+                context.read<SettingsBloc>().add(UpdateRateCurrencyEvent(_currencies[index]));
+              }),
             ])
           );
         }
@@ -67,6 +72,28 @@ class _PreferencesState extends State<Preferences> {
               items: _daysCount,
               currentItem: currentValue,
               onSelectedItemChangedCallback: changeValueCallback
+            )
+          )
+        ),
+        const Padding(padding: EdgeInsets.only(left: 15))
+      ]
+    );
+  }
+
+  Widget currencySetting(currentValue, selectItemCallback) {
+    return Row(
+      children: [
+        const Padding(padding: EdgeInsets.only(left: 15)),
+        Text(AppLocalizations.of(context)!.textCurrency),
+        const Spacer(),
+        CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Text(currentValue, style: const TextStyle(fontSize: 20.0)),
+          onPressed: () => _showCupertinoDialog(
+            CupertinoDialog(
+              items: _currencies,
+              currentItem: currentValue,
+              onSelectedItemChangedCallback: selectItemCallback
             )
           )
         ),
@@ -120,7 +147,7 @@ class _PreferencesState extends State<Preferences> {
                       itemExtent: 32.0,
                       backgroundColor: Colors.white,
                       onSelectedItemChanged: intPartChangeCallback,
-                      children: List.generate(101, (int index) => Center(child: Text(index.toString())))
+                      children: List.generate(1001, (int index) => Center(child: Text(index.toString())))
                     ),
                   ),
                   const Center(child: Text('.')),
