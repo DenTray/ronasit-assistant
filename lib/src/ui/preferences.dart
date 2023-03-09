@@ -34,24 +34,13 @@ class _PreferencesState extends State<Preferences> {
           return Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarPreferences), centerTitle: true),
             body: Column(children: [
-              const Padding(padding: EdgeInsets.only(top: 20)),
-              prefferedWorkingDaysCountSetting(state.workingDaysCount, (int selectedItem) => context.read<SettingsBloc>().add(UpdateWorkingDaysCountEvent(selectedItem + 1))),
-              languageSetting(state.locale, (int index) {
-                context.read<SettingsBloc>().add(UpdateLocaleEvent(_locales[index]));
-                _showChangeLocaleDialog();
-              }),
-              rateSetting(
-                state.rate,
-                (int index) {
-                  context.read<SettingsBloc>().add(UpdateRateEvent(index.toString(), null));
-                },
-                (int index) {
-                  context.read<SettingsBloc>().add(UpdateRateEvent(null, index.toString()));
-                }
-              ),
-              currencySetting(state.rateCurrency, (index) {
-                context.read<SettingsBloc>().add(UpdateRateCurrencyEvent(_currencies[index]));
-              }),
+              prefferedWorkingDaysCountSetting(context, state.workingDaysCount, context.read<SettingsBloc>()),
+              const Divider(height: 0),
+              languageSetting(context, state.locale, context.read<SettingsBloc>()),
+              const Divider(height: 0),
+              rateSetting(state.rate, context.read<SettingsBloc>()),
+              const Divider(height: 0),
+              currencySetting(context, context.read<SettingsBloc>(), state.rateCurrency),
             ])
           );
         }
@@ -59,119 +48,88 @@ class _PreferencesState extends State<Preferences> {
     );
   }
 
-  Widget prefferedWorkingDaysCountSetting(currentValue, changeValueCallback) {
-    return Row(
-      children: [
-        const Padding(padding: EdgeInsets.only(left: 15)),
-        Text(AppLocalizations.of(context)!.textPreferredDaysCount),
-        const Spacer(),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Text(currentValue.toString(), style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => UIHelpers.displayCupertinoDialog(
-            context,
-            CupertinoDialog(
-              items: _daysCount,
-              currentItem: currentValue,
-              onSelectedItemChangedCallback: changeValueCallback
-            )
-          )
-        ),
-        const Padding(padding: EdgeInsets.only(left: 15))
-      ]
+  Widget prefferedWorkingDaysCountSetting(context, currentValue, bloc) {
+    return preferenceItem(
+      () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
+        items: _daysCount,
+        currentItem: currentValue,
+        onSelectedItemChangedCallback: (int selectedItem) => bloc.add(UpdateWorkingDaysCountEvent(selectedItem + 1))
+      )),
+      Icons.calendar_month_outlined,
+      AppLocalizations.of(context)!.textPreferredDaysCount
     );
   }
 
-  Widget currencySetting(currentValue, selectItemCallback) {
-    return Row(
-      children: [
-        const Padding(padding: EdgeInsets.only(left: 15)),
-        Text(AppLocalizations.of(context)!.textCurrency),
-        const Spacer(),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Text(currentValue, style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => UIHelpers.displayCupertinoDialog(
-            context,
-            CupertinoDialog(
-              items: _currencies,
-              currentItem: currentValue,
-              onSelectedItemChangedCallback: selectItemCallback
-            )
-          )
-        ),
-        const Padding(padding: EdgeInsets.only(left: 15))
-      ]
+  Widget currencySetting(context, bloc, currentValue) {
+    return preferenceItem(
+      () => UIHelpers.displayCupertinoDialog(
+        context,
+        CupertinoDialog(
+          items: _currencies,
+          currentItem: currentValue,
+          onSelectedItemChangedCallback: (index) => bloc.add(UpdateRateCurrencyEvent(_currencies[index]))
+        )
+      ),
+      Icons.currency_exchange,
+      AppLocalizations.of(context)!.textCurrency
     );
   }
 
-  Widget languageSetting(currentValue, changeValueCallback) {
-    return Row(
-      children: [
-        const Padding(padding: EdgeInsets.only(left: 15)),
-        Text(AppLocalizations.of(context)!.textLanguage),
-        const Spacer(),
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          child: Text(currentValue, style: const TextStyle(fontSize: 20.0)),
-          onPressed: () => UIHelpers.displayCupertinoDialog(
-            context,
-            CupertinoDialog(
-              items: _locales,
-              currentItem: currentValue,
-              onSelectedItemChangedCallback: changeValueCallback
-            )
-          )
-        ),
-        const Padding(padding: EdgeInsets.only(left: 15))
-      ]
+  Widget languageSetting(context, currentValue, bloc) {
+    return preferenceItem(
+      () => UIHelpers.displayCupertinoDialog(
+        context,
+        CupertinoDialog(
+          items: _locales,
+          currentItem: currentValue,
+          onSelectedItemChangedCallback: (int index) {
+            bloc.add(UpdateLocaleEvent(_locales[index]));
+            _showChangeLocaleDialog();
+          }
+        )
+      ),
+      Icons.language,
+      AppLocalizations.of(context)!.textLanguage
     );
   }
 
-  Widget rateSetting(currentValue, intPartChangeCallback, decimalPartChangeCallback) {
-    return Row(
-      children: [
-        const Padding(padding: EdgeInsets.only(left: 15)),
-        Text(AppLocalizations.of(context)!.textRate),
-        const Spacer(),
-        CupertinoButton(
-          child: Text(currentValue.toString()),
-          onPressed: () => UIHelpers.displayCupertinoDialog(
-            context,
-            height: 500.0,
-            Container(
-              height: 300.0,
-              color: Colors.white,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: CupertinoPicker(
-                      scrollController: FixedExtentScrollController(initialItem: currentValue.toInt() ),
-                      itemExtent: 32.0,
-                      backgroundColor: Colors.white,
-                      onSelectedItemChanged: intPartChangeCallback,
-                      children: List.generate(1001, (int index) => Center(child: Text(index.toString())))
-                    ),
-                  ),
-                  const Center(child: Text('.')),
-                  Expanded(
-                    child: CupertinoPicker(
-                      scrollController: FixedExtentScrollController(initialItem: int.parse(currentValue.toString().split('.')[1])),
-                      itemExtent: 32.0,
-                      backgroundColor: Colors.white,
-                      onSelectedItemChanged: decimalPartChangeCallback,
-                      children: List.generate(100, (int index) => Center(child: Text(index.toString().padLeft(2, '0'))))
-                    )
-                  ),
-                ],
+  Widget rateSetting(currentValue, bloc) {
+    return preferenceItem(
+      () => UIHelpers.displayCupertinoDialog(
+        context,
+        height: 500.0,
+        Container(
+          height: 300.0,
+          color: Colors.white,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: currentValue.toInt()),
+                  itemExtent: 32.0,
+                  backgroundColor: Colors.white,
+                  onSelectedItemChanged: (int index) => bloc.add(UpdateRateEvent(index.toString(), null)),
+                  children: List.generate(1001, (int index) => Center(child: Text(index.toString())))
+                ),
               ),
-            )
-          )
-        ),
-        const Padding(padding: EdgeInsets.only(left: 15))
-      ],
+              const Center(child: Text('.')),
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: int.parse(currentValue.toString().split('.')[1])),
+                  itemExtent: 32.0,
+                  backgroundColor: Colors.white,
+                  onSelectedItemChanged: (int index) => bloc.add(UpdateRateEvent(null, index.toString())),
+                  children: List.generate(100, (int index) => Center(child: Text(index.toString().padLeft(2, '0'))))
+                )
+              ),
+            ],
+          ),
+        )
+      ),
+      Icons.query_stats_outlined,
+      AppLocalizations.of(context)!.textRate
     );
   }
 
@@ -191,6 +149,27 @@ class _PreferencesState extends State<Preferences> {
             child: Text(AppLocalizations.of(context)!.buttonLater),
             onPressed: () => Navigator.of(context).pop(true)
           )
+        ]
+      )
+    );
+  }
+
+  Widget preferenceItem(onPressCallback, IconData icon, String label) {
+    return OutlinedButton(
+      onPressed: onPressCallback,
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(style: BorderStyle.none),
+        fixedSize: Size(MediaQuery.of(context).size.width, 44)
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(children: [
+            Icon(icon),
+            const Padding(padding: EdgeInsets.only(left: 10)),
+            Text(label),
+          ]),
+          const Icon(Icons.arrow_right)
         ]
       )
     );
