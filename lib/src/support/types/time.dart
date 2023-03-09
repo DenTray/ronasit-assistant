@@ -24,7 +24,7 @@ class Time {
   }
 
   bool gte(double hours) {
-    return _hours >= hours;
+    return toDouble() >= hours;
   }
 
   bool lte(double hours) {

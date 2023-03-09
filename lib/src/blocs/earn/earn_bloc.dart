@@ -4,16 +4,21 @@ import '../../resources/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../resources/settings_repository.dart';
 import '../../resources/statistic_repository.dart';
+import '../../resources/currencies_repository.dart';
 import 'package:ronas_assistant/src/models/user.dart';
+import 'package:ronas_assistant/src/models/currency.dart';
 import 'package:ronas_assistant/src/models/settings.dart';
+import 'package:ronas_assistant/src/models/exchange.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/base_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/fetch_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/refresh_earn_event.dart';
+import 'package:ronas_assistant/src/blocs/earn/events/change_currency_event.dart';
 
 class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
   final _userRepository = UserRepository.getInstance();
   final _settingsRepository = SettingsRepository.getInstance();
   final _statisticRepository = StatisticRepository.getInstance();
+  final _currencyRepository = CurrenciesRepository.getInstance();
 
   bool isLoading = false;
 
@@ -25,18 +30,37 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
       User user = await _userRepository.getUser();
       Statistic statistic = await _statisticRepository.getTime(user.userName);
 
-      isLoading = false;
-
       emit(state.copyWith(
         statistic: statistic,
         rate: settings.rate
       ));
+
+      emit(state.copyWith(
+        currencies: await _currencyRepository.getCurrencies()
+      ));
+
+      isLoading = false;
+
+      add(ChangeCurrencyEvent(settings.exchangeCurrencySymbolIndex));
     });
 
     on<RefreshEarnEvent>((event, emit) async {
       _statisticRepository.resetCache();
 
       add(FetchEarnEvent());
+    });
+
+    on<ChangeCurrencyEvent>((event, emit) async {
+      Currency? currency = state.currencies?[event.currencyIndex];
+
+      //TODO get rate currency
+      Exchange exchange = await _currencyRepository.getExchange('USD', currency!.symbol);
+      await _settingsRepository.updateExchangeCurrency(event.currencyIndex);
+
+      emit(state.copyWith(
+        currency: currency,
+        quote: exchange.rate
+      ));
     });
   }
 
