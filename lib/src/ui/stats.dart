@@ -34,9 +34,7 @@ class _StatsState extends State<Stats> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                remainModeSwitcher(state.statistic != null, [!state.isRemainModeEnabled, state.isRemainModeEnabled], (int index) {
-                  context.read<StatisticBloc>().add(SetRemainModeEvent(index == 1));
-                }),
+                remainModeSwitcher(state.statistic != null, [!state.isRemainModeEnabled, state.isRemainModeEnabled], context.read<StatisticBloc>()),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
                 contributionRequiredLabel(state.isContributionRequired),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
@@ -110,7 +108,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget remainModeSwitcher(bool isLoaded, List<bool> isSelected, void Function(int) onSwitchCallback) {
+  Widget remainModeSwitcher(bool isLoaded, List<bool> isSelected, bloc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,7 +120,7 @@ class _StatsState extends State<Stats> {
           fillColor: Colors.blue[200],
           color: Colors.blue[400],
           constraints: const BoxConstraints(minHeight: 20, minWidth: 130),
-          onPressed: onSwitchCallback,
+          onPressed: (index) => bloc.add(SetRemainModeEvent(index == 1)),
           isSelected: isSelected,
           children: [
             Text(AppLocalizations.of(context)!.buttonEnableRemainMode, style: const TextStyle(fontSize: 15)),

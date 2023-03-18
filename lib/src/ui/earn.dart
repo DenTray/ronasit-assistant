@@ -48,10 +48,10 @@ class _EarnState extends State<Earn> {
       duration: const Duration(milliseconds: 200),
       child: ElevatedButton(
         onPressed: () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
-            fontSize: 15,
-            items: currencies,
-            currentItem: currencyName,
-            onSelectedItemChangedCallback: (index) => bloc.add(ChangeDisplayedCurrencyEvent(index))
+          fontSize: 15,
+          items: currencies,
+          currentItem: currencyName,
+          onSelectedItemChangedCallback: (index) => bloc.add(ChangeDisplayedCurrencyEvent(index))
         )),
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(Colors.blue),
