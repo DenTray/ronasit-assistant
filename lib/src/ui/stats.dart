@@ -113,7 +113,7 @@ class _StatsState extends State<Stats> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        hidden(isLoaded, ToggleButtons(
+        loadable(isLoaded, ToggleButtons(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           selectedBorderColor: Colors.blue[700],
           selectedColor: Colors.white,
@@ -152,7 +152,7 @@ class _StatsState extends State<Stats> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        hidden(isLoaded, RefreshButton(
+        loadable(isLoaded, RefreshButton(
           isProcessing: isProcessing,
           refreshIconAngle: iconAngle,
           callback: () => bloc.add(RefreshStatisticEvent())
@@ -168,7 +168,7 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget hidden(bool isLoaded, Widget child) {
+  Widget loadable(bool isLoaded, Widget child) {
     return AnimatedOpacity(
       opacity: (isLoaded) ? 1 : 0,
       duration: const Duration(milliseconds: 200),
