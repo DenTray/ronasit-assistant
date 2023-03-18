@@ -1,11 +1,11 @@
 import 'dart:async';
-import '../models/user.dart';
+import 'package:ronas_assistant/src/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class UserRepository {
-  static UserRepository? _instance;
+class UsersRepository {
+  static UsersRepository? _instance;
 
-  Future<User> getUser() async {
+  Future<User> getCurrentUser() async {
     final preferences = await SharedPreferences.getInstance();
 
     return User(
@@ -15,15 +15,15 @@ class UserRepository {
     );
   }
 
-  Future setUser(String firstName, String lastName, String userName) async {
+  Future setCurrentUser(User user) async {
     final preferences = await SharedPreferences.getInstance();
 
-    await preferences.setString('user.first_name', firstName);
-    await preferences.setString('user.last_name', lastName);
-    await preferences.setString('user.username', userName);
+    await preferences.setString('user.first_name', user.fistName);
+    await preferences.setString('user.last_name', user.lastName);
+    await preferences.setString('user.username', user.userName);
   }
 
-  Future removeUser() async {
+  Future resetCurrentUser() async {
     final preferences = await SharedPreferences.getInstance();
 
     await preferences.remove('user.first_name');
@@ -31,7 +31,7 @@ class UserRepository {
     await preferences.remove('user.username');
   }
 
-  factory UserRepository.getInstance() => _instance ??= UserRepository._internal();
+  factory UsersRepository.getInstance() => _instance ??= UsersRepository._internal();
 
-  UserRepository._internal();
+  UsersRepository._internal();
 }
