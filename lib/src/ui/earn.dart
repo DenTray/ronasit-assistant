@@ -10,7 +10,7 @@ import 'package:ronas_assistant/src/blocs/earn/earn_bloc.dart';
 import 'package:ronas_assistant/src/blocs/earn/earn_state.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/fetch_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/refresh_earn_event.dart';
-import 'package:ronas_assistant/src/blocs/earn/events/change_currency_event.dart';
+import 'package:ronas_assistant/src/blocs/earn/events/change_displayed_currency_event.dart';
 
 class Earn extends StatefulWidget {
   const Earn({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class _EarnState extends State<Earn> {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                chooseCurrencyButton(state.isLoading, state.currency?.name ?? '', state.currenciesNames, state.quote, context.read<EarnBloc>()),
+                chooseCurrencyButton(state.isLoading, state.displayedCurrency?.name ?? '', state.currenciesNames, state.exchangeRate, context.read<EarnBloc>()),
                 earnContent(state.isLoading, state.formattedTodayEarned, state.formattedWeekEarned, state.formattedMonthEarned),
                 refreshButton(state.isLoading, state.refreshIconAngle, context.read<EarnBloc>())
               ]
@@ -51,9 +51,7 @@ class _EarnState extends State<Earn> {
             fontSize: 15,
             items: currencies,
             currentItem: currencyName,
-            onSelectedItemChangedCallback: (index) {
-              bloc.add(ChangeCurrencyEvent(index));
-            }
+            onSelectedItemChangedCallback: (index) => bloc.add(ChangeDisplayedCurrencyEvent(index))
         )),
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(Colors.blue),
