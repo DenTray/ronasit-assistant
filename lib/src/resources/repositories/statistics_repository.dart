@@ -1,10 +1,10 @@
 import 'dart:async';
-import '../models/statistic.dart';
-import 'ronas_it_api_provider.dart';
+import 'package:ronas_assistant/src/models/statistic.dart';
+import 'package:ronas_assistant/src/resources/ronas_it_api_provider.dart';
 
-class StatisticRepository {
+class StatisticsRepository {
   final ronasITApiProvider = RonasITApiProvider.getInstance();
-  static StatisticRepository? _instance;
+  static StatisticsRepository? _instance;
 
   Statistic? _statistic;
 
@@ -28,7 +28,7 @@ class StatisticRepository {
     _statistic = null;
   }
 
-  factory StatisticRepository.getInstance() => _instance ??= StatisticRepository._internal();
+  factory StatisticsRepository.getInstance() => _instance ??= StatisticsRepository._internal();
 
-  StatisticRepository._internal();
+  StatisticsRepository._internal();
 }

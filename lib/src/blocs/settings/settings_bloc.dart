@@ -6,7 +6,7 @@ import './events/base_settings_event.dart';
 import './events/update_locale_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './events/update_rate_currency_event.dart';
-import '../../resources/settings_repository.dart';
+import '../../resources/repositories/settings_repository.dart';
 import './events/update_working_days_count_event.dart';
 
 class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {

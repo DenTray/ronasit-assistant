@@ -1,5 +1,5 @@
 import 'dart:async';
-import '../models/settings.dart';
+import '../../models/settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsRepository {

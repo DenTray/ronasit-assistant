@@ -1,20 +1,20 @@
 import 'statistic_state.dart';
 import '../../models/statistic.dart';
-import '../../resources/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../resources/settings_repository.dart';
-import '../../resources/statistic_repository.dart';
 import 'package:ronas_assistant/src/models/user.dart';
 import 'package:ronas_assistant/src/models/settings.dart';
+import 'package:ronas_assistant/src/resources/repositories/users_repository.dart';
 import 'package:ronas_assistant/src/blocs/stats/events/base_statistic_event.dart';
 import 'package:ronas_assistant/src/blocs/stats/events/fetch_statistic_event.dart';
 import 'package:ronas_assistant/src/blocs/stats/events/set_remain_mode_event.dart';
+import 'package:ronas_assistant/src/resources/repositories/settings_repository.dart';
 import 'package:ronas_assistant/src/blocs/stats/events/refresh_statistic_event.dart';
+import 'package:ronas_assistant/src/resources/repositories/statistics_repository.dart';
 
 class StatisticBloc extends Bloc<BaseStatisticEvent, StatisticState> {
-  final _userRepository = UserRepository.getInstance();
+  final _usersRepository = UsersRepository.getInstance();
   final _settingsRepository = SettingsRepository.getInstance();
-  final _statisticRepository = StatisticRepository.getInstance();
+  final _statisticsRepository = StatisticsRepository.getInstance();
 
   bool isLoading = false;
 
@@ -23,8 +23,8 @@ class StatisticBloc extends Bloc<BaseStatisticEvent, StatisticState> {
       runRefreshIconRotation();
 
       Settings settings = await _settingsRepository.getSettings();
-      User user = await _userRepository.getUser();
-      Statistic statistic = await _statisticRepository.getTime(user.userName);
+      User user = await _usersRepository.getCurrentUser();
+      Statistic statistic = await _statisticsRepository.getTime(user.userName);
 
       isLoading = false;
 
@@ -36,7 +36,7 @@ class StatisticBloc extends Bloc<BaseStatisticEvent, StatisticState> {
     });
 
     on<RefreshStatisticEvent>((event, emit) async {
-      _statisticRepository.resetCache();
+      _statisticsRepository.resetCache();
 
       add(FetchStatisticEvent());
     });

@@ -1,24 +1,24 @@
 import 'earn_state.dart';
-import '../../models/statistic.dart';
-import '../../resources/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../resources/settings_repository.dart';
-import '../../resources/statistic_repository.dart';
-import '../../resources/currencies_repository.dart';
 import 'package:ronas_assistant/src/models/user.dart';
 import 'package:ronas_assistant/src/models/currency.dart';
 import 'package:ronas_assistant/src/models/settings.dart';
 import 'package:ronas_assistant/src/models/exchange.dart';
+import 'package:ronas_assistant/src/models/statistic.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/base_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/fetch_earn_event.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/refresh_earn_event.dart';
+import 'package:ronas_assistant/src/resources/repositories/users_repository.dart';
+import 'package:ronas_assistant/src/resources/repositories/settings_repository.dart';
+import 'package:ronas_assistant/src/resources/repositories/statistics_repository.dart';
+import 'package:ronas_assistant/src/resources/repositories/currencies_repository.dart';
 import 'package:ronas_assistant/src/blocs/earn/events/change_displayed_currency_event.dart';
 
 class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
-  final _userRepository = UserRepository.getInstance();
+  final _usersRepository = UsersRepository.getInstance();
   final _settingsRepository = SettingsRepository.getInstance();
-  final _statisticRepository = StatisticRepository.getInstance();
-  final _currencyRepository = CurrenciesRepository.getInstance();
+  final _statisticsRepository = StatisticsRepository.getInstance();
+  final _currenciesRepository = CurrenciesRepository.getInstance();
 
   bool isLoading = false;
 
@@ -27,12 +27,12 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
       runRefreshIconRotation();
 
       Settings settings = await _settingsRepository.getSettings();
-      User user = await _userRepository.getUser();
-      Statistic statistic = await _statisticRepository.getTime(user.userName);
-      List<Currency> currencies = await _currencyRepository.getCurrencies();
+      User user = await _usersRepository.getCurrentUser();
+      Statistic statistic = await _statisticsRepository.getTime(user.userName);
+      List<Currency> currencies = await _currenciesRepository.getCurrencies();
       Currency displayedCurrency = currencies[settings.exchangeCurrencySymbolIndex];
       //TODO get rate currency
-      Exchange exchange = await _currencyRepository.getExchange('USD', displayedCurrency.symbol);
+      Exchange exchange = await _currenciesRepository.getExchange('USD', displayedCurrency.symbol);
 
       emit(state.copyWith(
         statistic: statistic,
@@ -46,8 +46,8 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
     });
 
     on<RefreshEarnEvent>((event, emit) async {
-      _statisticRepository.resetCache();
-      _currencyRepository.resetCache();
+      _statisticsRepository.resetCache();
+      _currenciesRepository.resetCache();
 
       add(FetchEarnEvent());
     });
@@ -56,7 +56,7 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
       Currency? displayedCurrency = state.currencies?[event.currencyIndex];
 
       //TODO get rate currency
-      Exchange exchange = await _currencyRepository.fetchExchange('USD', displayedCurrency!.symbol);
+      Exchange exchange = await _currenciesRepository.fetchExchange('USD', displayedCurrency!.symbol);
       await _settingsRepository.updateExchangeCurrency(event.currencyIndex);
 
       emit(state.copyWith(

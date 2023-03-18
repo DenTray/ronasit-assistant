@@ -1,18 +1,18 @@
 import 'profile_state.dart';
-import '../../resources/user_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ronas_assistant/src/models/user.dart';
-import 'package:ronas_assistant/src/resources/statistic_repository.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/logout_event.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/full_avatar_event.dart';
+import 'package:ronas_assistant/src/resources/repositories/users_repository.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/small_avatar_event.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/base_profile_event.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/loaded_avatar_event.dart';
 import 'package:ronas_assistant/src/blocs/profile/events/fetch_profile_event.dart';
+import 'package:ronas_assistant/src/resources/repositories/statistics_repository.dart';
 
 class ProfileBloc extends Bloc<BaseProfileEvent, ProfileState> {
-  final _userRepository = UserRepository.getInstance();
-  final _statisticRepository = StatisticRepository.getInstance();
+  final _usersRepository = UsersRepository.getInstance();
+  final _statisticsRepository = StatisticsRepository.getInstance();
 
   ProfileBloc() : super(ProfileState(isLoading: true)) {
     on<FetchProfileEvent>((event, emit) async {
@@ -20,7 +20,7 @@ class ProfileBloc extends Bloc<BaseProfileEvent, ProfileState> {
         isLoading: true
       ));
 
-      User user = await _userRepository.getUser();
+      User user = await _usersRepository.getCurrentUser();
 
       emit(state.copyWith(
         user: user,
@@ -33,8 +33,8 @@ class ProfileBloc extends Bloc<BaseProfileEvent, ProfileState> {
         isLoading: true
       ));
 
-      await _userRepository.removeUser();
-      _statisticRepository.resetCache();
+      await _usersRepository.resetCurrentUser();
+      _statisticsRepository.resetCache();
 
       emit(state.copyWith(
         isLoading: false
