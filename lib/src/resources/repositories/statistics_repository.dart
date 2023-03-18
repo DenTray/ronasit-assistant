@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:ronas_assistant/src/models/statistic.dart';
-import 'package:ronas_assistant/src/resources/ronas_it_api_provider.dart';
+import 'package:ronas_assistant/src/resources/api_providers/ronas_it_api_provider.dart';
 
 class StatisticsRepository {
   final ronasITApiProvider = RonasITApiProvider.getInstance();
