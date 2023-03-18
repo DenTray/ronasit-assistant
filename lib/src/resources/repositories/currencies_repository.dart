@@ -1,8 +1,8 @@
 import 'dart:async';
-import '../api_providers/exchange_rate_api_provider.dart';
-import '../../models/currencies_response.dart';
 import 'package:ronas_assistant/src/models/currency.dart';
 import 'package:ronas_assistant/src/models/exchange.dart';
+import 'package:ronas_assistant/src/models/currencies_response.dart';
+import 'package:ronas_assistant/src/resources/api_providers/exchange_rate_api_provider.dart';
 
 class CurrenciesRepository {
   final exchangeRateApiProvider = ExchangeRateApiProvider.getInstance();
