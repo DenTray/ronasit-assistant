@@ -4,7 +4,7 @@ class Settings {
   late final bool _isRemainModeEnabled;
   late final double _rate;
   late final String _rateCurrency;
-  late final int _exchangeCurrencySymbolIndex;
+  late final int _displayedCurrencySymbolIndex;
 
   Settings(
       this._preferredWorkingDaysCount,
@@ -12,7 +12,7 @@ class Settings {
       this._isRemainModeEnabled,
       this._rate,
       this._rateCurrency,
-      this._exchangeCurrencySymbolIndex
+      this._displayedCurrencySymbolIndex
   );
 
   String get language => _language;
@@ -20,5 +20,5 @@ class Settings {
   bool get isRemainModeEnabled => _isRemainModeEnabled;
   double get rate => _rate;
   String get rateCurrency => _rateCurrency;
-  int get exchangeCurrencySymbolIndex => _exchangeCurrencySymbolIndex;
+  int get displayedCurrencySymbolIndex => _displayedCurrencySymbolIndex;
 }

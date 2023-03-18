@@ -30,7 +30,7 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
       User user = await _usersRepository.getCurrentUser();
       Statistic statistic = await _statisticsRepository.getTime(user.userName);
       List<Currency> currencies = await _currenciesRepository.getCurrencies();
-      Currency displayedCurrency = currencies[settings.exchangeCurrencySymbolIndex];
+      Currency displayedCurrency = currencies[settings.displayedCurrencySymbolIndex];
       //TODO get rate currency
       Exchange exchange = await _currenciesRepository.getExchange('USD', displayedCurrency.symbol);
 
