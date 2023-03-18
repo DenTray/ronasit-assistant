@@ -31,24 +31,9 @@ class _EarnState extends State<Earn> {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                chooseCurrencyButton(
-                  state.currency?.name ?? '',
-                  state.quote,
-                  () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
-                    fontSize: 15,
-                    items: state.currenciesNames!,
-                    currentItem: state.currency?.name,
-                    onSelectedItemChangedCallback: (index) {
-                      context.read<EarnBloc>().add(ChangeCurrencyEvent(index));
-                    }
-                  ))
-                ),
+                chooseCurrencyButton(state.isLoading, state.currency?.name ?? '', state.currenciesNames, state.quote, context.read<EarnBloc>()),
                 earnContent(state.isLoading, state.formattedTodayEarned, state.formattedWeekEarned, state.formattedMonthEarned),
-                refreshButton(
-                  state.isLoading,
-                  state.refreshIconAngle,
-                  () => context.read<EarnBloc>().add(RefreshEarnEvent())
-                )
+                refreshButton(state.isLoading, state.refreshIconAngle, context.read<EarnBloc>())
               ]
             )
           );
@@ -57,38 +42,49 @@ class _EarnState extends State<Earn> {
     );
   }
 
-  Widget chooseCurrencyButton(String currencyName, double quote, callback) {
-    return ElevatedButton(
-      onPressed: callback,
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.blue),
-        fixedSize: MaterialStateProperty.all(const Size.fromWidth(260))
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: AutoSizeText.rich(
-              TextSpan(text: currencyName),
-              style: const TextStyle(fontSize: 15),
-              minFontSize: 1,
-              maxLines: 1,
-            )
-          ),
-          Text('(${quote.toStringAsFixed(2)})'),
-          const Icon(Icons.arrow_drop_down)
-        ]
+  Widget chooseCurrencyButton(bool isLoading, String currencyName, List<String> currencies, double quote, bloc) {
+    return AnimatedOpacity(
+      opacity: (isLoading) ? 0 : 1,
+      duration: const Duration(milliseconds: 200),
+      child: ElevatedButton(
+        onPressed: () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
+            fontSize: 15,
+            items: currencies,
+            currentItem: currencyName,
+            onSelectedItemChangedCallback: (index) {
+              bloc.add(ChangeCurrencyEvent(index));
+            }
+        )),
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.blue),
+          fixedSize: MaterialStateProperty.all(const Size.fromWidth(260))
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: AutoSizeText.rich(
+                TextSpan(text: currencyName),
+                style: const TextStyle(fontSize: 15),
+                minFontSize: 1,
+                maxLines: 1,
+              )
+            ),
+            Text('(${quote.toStringAsFixed(2)})'),
+            const Icon(Icons.arrow_drop_down)
+          ]
+        )
       )
     );
   }
 
-  Widget refreshButton(bool isLoading, double refreshIconAngle, callback) {
+  Widget refreshButton(bool isLoading, double refreshIconAngle, bloc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         RefreshButton(
-          callback: callback,
+          callback: () => bloc.add(RefreshEarnEvent()),
           isProcessing: isLoading,
           refreshIconAngle: refreshIconAngle
         )

@@ -34,7 +34,7 @@ class _StatsState extends State<Stats> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                remainModeSwitcher([!state.isRemainModeEnabled, state.isRemainModeEnabled], (int index) {
+                remainModeSwitcher(state.statistic != null, [!state.isRemainModeEnabled, state.isRemainModeEnabled], (int index) {
                   context.read<StatisticBloc>().add(SetRemainModeEvent(index == 1));
                 }),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
@@ -42,9 +42,7 @@ class _StatsState extends State<Stats> {
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
                 (state.statistic == null) ? const CircularProgressIndicator() : statsBlock(state),
                 const Padding(padding: EdgeInsets.only(top: 50)),
-                refreshButtonLine(state.isLoading, state.refreshIconAngle, () {
-                  context.read<StatisticBloc>().add(RefreshStatisticEvent());
-                })
+                refreshButtonLine(state.statistic != null, state.isLoading, state.refreshIconAngle, context.read<StatisticBloc>())
               ]
             )
           );
@@ -77,7 +75,7 @@ class _StatsState extends State<Stats> {
             Text(
               style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
               (state.isRemainModeEnabled)
-                ? '${getTimeSign(state.todayRemainTime)}${state.todayRemainTime.toString()}'
+                ? '${getTimeSign(state.todayRemainTime)}${state.todayRemainTime.toString()} (${state.finishTime})'
                 : '${state.todayTime.toString()}/${state.dayPlan.toString()}',
             ),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
@@ -112,12 +110,12 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget remainModeSwitcher(List<bool> isSelected, void Function(int) onSwitchCallback) {
+  Widget remainModeSwitcher(bool isLoaded, List<bool> isSelected, void Function(int) onSwitchCallback) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ToggleButtons(
+        hidden(isLoaded, ToggleButtons(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           selectedBorderColor: Colors.blue[700],
           selectedColor: Colors.white,
@@ -129,8 +127,8 @@ class _StatsState extends State<Stats> {
           children: [
             Text(AppLocalizations.of(context)!.buttonEnableRemainMode, style: const TextStyle(fontSize: 15)),
             Text(AppLocalizations.of(context)!.buttonDisableRemainMode, style: const TextStyle(fontSize: 15))
-          ],
-        ),
+          ]
+        ))
       ]
     );
   }
@@ -151,12 +149,16 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget refreshButtonLine(bool isProcessing, iconAngle, callback) {
+  Widget refreshButtonLine(bool isLoaded, bool isProcessing, iconAngle, bloc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        RefreshButton(isProcessing: isProcessing, refreshIconAngle: iconAngle, callback: callback)
+        hidden(isLoaded, RefreshButton(
+          isProcessing: isProcessing,
+          refreshIconAngle: iconAngle,
+          callback: () => bloc.add(RefreshStatisticEvent())
+        ))
       ]
     );
   }
@@ -165,6 +167,14 @@ class _StatsState extends State<Stats> {
     return Opacity(
       opacity: (isVisible) ? 1 : 0,
       child: const Icon(Icons.done, color: Colors.lightGreen)
+    );
+  }
+
+  Widget hidden(bool isLoaded, Widget child) {
+    return AnimatedOpacity(
+      opacity: (isLoaded) ? 1 : 0,
+      duration: const Duration(milliseconds: 200),
+      child: child
     );
   }
 }

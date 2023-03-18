@@ -8,7 +8,7 @@ class EarnState {
   late double refreshIconAngle;
   late double rate = 1;
   late List<Currency>? currencies;
-  late List<String>? currenciesNames;
+  List<String> currenciesNames = [];
 
   int? currencyIndex;
   Currency? currency;
@@ -23,7 +23,7 @@ class EarnState {
 
   EarnState({
     Statistic? statistic,
-    bool isLoading = false,
+    bool isLoading = true,
     double refreshIconAngle = 1,
     double rate = 1,
     List<Currency>? currencies,
@@ -40,13 +40,15 @@ class EarnState {
 
     if (currency != null) {
       this.currency = currency;
-    } else if (currencies != null) {
-      this.currency = currencies[0];
     }
 
-    bool hasCurrencyFormatter = this.currency != null && CurrencyFormatter.majors[this.currency!.symbol.toLowerCase()] != null;
+    if (currencies != null) {
+      currenciesNames = currencies.map((Currency currency) => currency.name).toList();
+    }
 
     if (statistic != null) {
+      bool hasCurrencyFormatter = this.currency != null && CurrencyFormatter.majors[this.currency!.symbol.toLowerCase()] != null;
+
       todayEarned = statistic.totalHours.today * rate;
       double todayEarnedInCurrency = todayEarned * quote;
       formattedTodayEarned = getFormattedMoneyString(hasCurrencyFormatter, todayEarnedInCurrency, this.currency);
@@ -58,10 +60,6 @@ class EarnState {
       monthEarned = statistic.totalHours.month * rate;
       double monthEarnedInCurrency = monthEarned * quote;
       formattedMonthEarned = getFormattedMoneyString(hasCurrencyFormatter, monthEarnedInCurrency, this.currency);
-    }
-
-    if (currencies != null) {
-      currenciesNames = currencies.map((Currency currency) => currency.name).toList();
     }
   }
 

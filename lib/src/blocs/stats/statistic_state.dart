@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:ronas_assistant/src/models/statistic.dart';
 import 'package:ronas_assistant/src/support/types/time.dart';
 
@@ -10,6 +11,7 @@ class StatisticState {
   Time weekRemainTime = Time();
   Time monthTime = Time();
   Time monthRemainTime = Time();
+  String finishTime = '';
 
   Time dayPlan = Time().fromDouble(8);
   int weekPlan = 40;
@@ -41,6 +43,8 @@ class StatisticState {
       }
 
       todayRemainTime = dayPlan.sub(todayTime);
+      DateTime now = DateTime.now().add(Duration(minutes: (todayRemainTime.toDouble() * 60).toInt()));
+      finishTime = DateFormat('kk:mm').format(now);
       weekRemainTime = Time().fromDouble(weekPlan.toDouble()).sub(weekTime);
       monthRemainTime = Time().fromDouble(monthPlan.toDouble()).sub(monthTime);
 
