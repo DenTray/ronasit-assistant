@@ -53,11 +53,11 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
     });
 
     on<ChangeDisplayedCurrencyEvent>((event, emit) async {
-      Currency? displayedCurrency = state.currencies?[event.currencyIndex];
+      Currency displayedCurrency = state.currencies![event.currencyIndex];
 
       //TODO get rate currency
-      Exchange exchange = await _currenciesRepository.fetchExchange('USD', displayedCurrency!.symbol);
-      await _settingsRepository.updateExchangeCurrency(event.currencyIndex);
+      Exchange exchange = await _currenciesRepository.fetchExchange('USD', displayedCurrency.symbol);
+      await _settingsRepository.updateDisplayedCurrencyIndex(event.currencyIndex);
 
       emit(state.copyWith(
         displayedCurrency: displayedCurrency,

@@ -18,7 +18,7 @@ class SettingsRepository {
     );
   }
 
-  updateExchangeCurrency(int index) async {
+  updateDisplayedCurrencyIndex(int index) async {
     final preferences = await SharedPreferences.getInstance();
 
     preferences.setInt('preferences.exchange_currency_symbol_index', index);
