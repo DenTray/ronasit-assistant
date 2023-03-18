@@ -14,14 +14,14 @@ class SettingsRepository {
       preferences.getBool('preferences.is_remain_mode_enabled') ?? false,
       preferences.getDouble('preferences.rate') ?? 1.0,
       preferences.getString('preferences.rate_currency') ?? '\$',
-      preferences.getInt('preferences.exchange_currency_symbol_index') ?? 0
+      preferences.getInt('preferences.displayed_currency_symbol_index') ?? 0
     );
   }
 
   updateDisplayedCurrencyIndex(int index) async {
     final preferences = await SharedPreferences.getInstance();
 
-    preferences.setInt('preferences.exchange_currency_symbol_index', index);
+    preferences.setInt('preferences.displayed_currency_symbol_index', index);
   }
 
   updateRemainMode(bool isEnabled) async {
