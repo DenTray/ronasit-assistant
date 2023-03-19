@@ -13,12 +13,12 @@ import '../../resources/repositories/currencies_repository.dart';
 
 class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
   final _repository = SettingsRepository.getInstance();
-  final _currencyRepository = CurrenciesRepository.getInstance();
+  final _currenciesRepository = CurrenciesRepository.getInstance();
 
   SettingsBloc() : super(SettingsState()) {
     on<GetSettingsEvent>((event, emit) async {
       Settings settings = await _repository.getSettings();
-      List<Currency> currencies = await _currencyRepository.getCurrencies();
+      List<Currency> currencies = await _currenciesRepository.getCurrencies();
       SettingsState state = SettingsState(
         settings: settings,
         currenciesNames: currencies.map((Currency currency) => currency.name).toList()
