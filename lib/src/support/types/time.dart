@@ -2,16 +2,23 @@ class Time {
   int _hours = 0;
   int _minutes = 0;
   bool _isPositive = true;
+  bool _isNegative = false;
 
   bool get isPositive => _isPositive;
+  bool get isNegative => _isNegative;
 
-  Time fromDouble(double hours) {
-    _hours = hours.truncate();
-    _minutes = ((hours - _hours) * 60).round();
+  Time({ int hours = 0, int minutes = 0 }) {
+    _hours = hours;
+    _minutes = minutes;
+    _isPositive = _hours > 0 && _minutes > 0;
+    _isNegative = _hours < 0 || _hours == 0 && _minutes < 0;
+  }
 
-    _isPositive = hours >= 0;
+  static Time fromDouble({ double hours = 0}) {
+    int hoursCount = hours.truncate();
+    int minutesCount = ((hours - hoursCount) * 60).round();
 
-    return this;
+    return Time(hours: hoursCount, minutes: minutesCount);
   }
 
   double toDouble() {
@@ -23,6 +30,10 @@ class Time {
     return '${_hours.abs()}:${_minutes.abs().toString().padLeft(2, '0')}';
   }
 
+  String toInvertedSignedString() {
+    return (_isNegative) ? '+${toString()}' : toString();
+  }
+
   bool gte(double hours) {
     return toDouble() >= hours;
   }
@@ -32,6 +43,6 @@ class Time {
   }
 
   Time sub(Time time) {
-    return Time().fromDouble(toDouble() - time.toDouble());
+    return Time.fromDouble(hours: toDouble() - time.toDouble());
   }
 }

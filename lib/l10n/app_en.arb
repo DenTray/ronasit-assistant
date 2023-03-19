@@ -24,6 +24,7 @@
   "placeholderEnterUsername": "Enter your username",
   "textAuthorization": "Authorization",
   "textCurrency": "Currency",
+  "textFinishTime": "Your work day will be finished at ",
   "textEnterName": "Please enter your name",
   "textLanguage": "Language",
   "textPreferredDaysCount": "Preferred working days count",

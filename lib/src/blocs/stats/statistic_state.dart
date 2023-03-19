@@ -13,9 +13,9 @@ class StatisticState {
   Time monthRemainTime = Time();
   String finishTime = '';
 
-  Time dayPlan = Time().fromDouble(8);
-  int weekPlan = 40;
-  int monthPlan = 160;
+  Time dayPlan = Time.fromDouble(hours: 8);
+  Time weekPlan = Time.fromDouble(hours: 40);
+  Time monthPlan = Time.fromDouble(hours: 160);
 
   bool isRemainModeEnabled = false;
   bool isContributionRequired = false;
@@ -31,22 +31,23 @@ class StatisticState {
     this.preferableWorkingDaysCount = preferableWorkingDaysCount;
 
     if (statistic != null) {
-      todayTime = Time().fromDouble(statistic.totalHours.today);
-      weekTime = Time().fromDouble(statistic.totalHours.week);
-      monthTime = Time().fromDouble(statistic.totalHours.month);
+      todayTime = Time.fromDouble(hours: statistic.totalHours.today);
+      weekTime = Time.fromDouble(hours: statistic.totalHours.week);
+      monthTime = Time.fromDouble(hours: statistic.totalHours.month);
 
-      weekPlan = statistic.plans.week;
-      monthPlan = statistic.plans.month;
+      weekPlan = Time.fromDouble(hours: statistic.plans.week.toDouble());
+      monthPlan = Time.fromDouble(hours: statistic.plans.month.toDouble());
 
       if (preferableWorkingDaysCount != null) {
         dayPlan = calculateDailyPlan(weekPlan, preferableWorkingDaysCount);
       }
 
       todayRemainTime = dayPlan.sub(todayTime);
+      weekRemainTime = weekPlan.sub(weekTime);
+      monthRemainTime = monthPlan.sub(monthTime);
+
       DateTime now = DateTime.now().add(Duration(minutes: (todayRemainTime.toDouble() * 60).toInt()));
       finishTime = DateFormat('kk:mm').format(now);
-      weekRemainTime = Time().fromDouble(weekPlan.toDouble()).sub(weekTime);
-      monthRemainTime = Time().fromDouble(monthPlan.toDouble()).sub(monthTime);
 
       isContributionRequired = todayTime.gte(1) && statistic.contributions.today == 0;
     }
@@ -56,21 +57,21 @@ class StatisticState {
     }
   }
 
-  Time calculateDailyPlan(int weekPlan, int preferableWorkingDaysCount) {
+  Time calculateDailyPlan(Time weekPlan, int preferableWorkingDaysCount) {
     int currentDayWeek = DateTime.now().weekday;
 
     int daysLeft = preferableWorkingDaysCount - currentDayWeek + 1;
-    double hoursLeft = weekPlan - weekTime.toDouble() + todayTime.toDouble();
+    double hoursLeft = weekPlan.toDouble() - weekTime.toDouble() + todayTime.toDouble();
 
-    if (daysLeft < 0 && weekTime.toDouble() >= weekPlan) {
-      return Time().fromDouble(0);
+    if (daysLeft < 0 && weekTime.gte(weekPlan.toDouble())) {
+      return Time();
     }
 
     if (daysLeft <= 0) {
       daysLeft = 1;
     }
 
-    return Time().fromDouble(hoursLeft / daysLeft);
+    return Time.fromDouble(hours: hoursLeft / daysLeft);
   }
 
   StatisticState copyWith({

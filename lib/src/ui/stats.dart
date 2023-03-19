@@ -18,9 +18,7 @@ class Stats extends StatefulWidget {
 }
 
 class _StatsState extends State<Stats> {
-  String getTimeSign(Time? time) {
-    return (time != null && !time.isPositive) ? '+' : '';
-  }
+  final GlobalKey<TooltipState> tooltipKey = GlobalKey<TooltipState>();
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +32,13 @@ class _StatsState extends State<Stats> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                remainModeSwitcher(state.statistic != null, [!state.isRemainModeEnabled, state.isRemainModeEnabled], context.read<StatisticBloc>()),
+                remainModeSwitcher(state, context.read<StatisticBloc>()),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
                 contributionRequiredLabel(state.isContributionRequired),
                 const Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
                 (state.statistic == null) ? const CircularProgressIndicator() : statsBlock(state),
                 const Padding(padding: EdgeInsets.only(top: 50)),
-                refreshButtonLine(state.statistic != null, state.isLoading, state.refreshIconAngle, context.read<StatisticBloc>())
+                refreshButtonLine(state, context.read<StatisticBloc>())
               ]
             )
           );
@@ -70,26 +68,11 @@ class _StatsState extends State<Stats> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
-              (state.isRemainModeEnabled)
-                ? '${getTimeSign(state.todayRemainTime)}${state.todayRemainTime.toString()} (${state.finishTime})'
-                : '${state.todayTime.toString()}/${state.dayPlan.toString()}',
-            ),
+            time(state, state.todayRemainTime, state.todayTime, state.dayPlan),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            Text(
-              style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
-              (state.isRemainModeEnabled)
-                ? '${getTimeSign(state.weekRemainTime)}${state.weekRemainTime.toString()}'
-                : '${state.weekTime.toString()}/${state.weekPlan}',
-            ),
+            time(state, state.weekRemainTime, state.weekTime, state.weekPlan),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            Text(
-              style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
-              (state.isRemainModeEnabled)
-                ? '${getTimeSign(state.monthRemainTime)}${state.monthRemainTime.toString()}'
-                : '${state.monthTime}/${state.monthPlan}',
-            )
+            time(state, state.monthRemainTime, state.monthTime, state.monthPlan),
           ]
         ),
         const Padding(padding: EdgeInsets.only(left: 20, right: 20)),
@@ -97,18 +80,21 @@ class _StatsState extends State<Stats> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            completeIcon(state.todayTime.gte(state.dayPlan.toDouble())),
+            (state.todayRemainTime.isPositive) ? finishTime(AppLocalizations.of(context)!.textFinishTime + state.finishTime) : completeIcon(!state.todayRemainTime.isPositive),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            completeIcon(state.weekTime.gte(state.weekPlan.toDouble())),
+            completeIcon(!state.weekRemainTime.isPositive),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            completeIcon(state.monthTime.gte(state.monthPlan.toDouble()))
+            completeIcon(!state.monthRemainTime.isPositive)
           ]
         )
       ]
     );
   }
 
-  Widget remainModeSwitcher(bool isLoaded, List<bool> isSelected, bloc) {
+  Widget remainModeSwitcher(StatisticState state, StatisticBloc bloc) {
+    bool isLoaded = state.statistic != null;
+    List<bool> isSelected = [!state.isRemainModeEnabled, state.isRemainModeEnabled];
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,14 +133,14 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget refreshButtonLine(bool isLoaded, bool isProcessing, iconAngle, bloc) {
+  Widget refreshButtonLine(StatisticState state, StatisticBloc bloc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        loadable(isLoaded, RefreshButton(
-          isProcessing: isProcessing,
-          refreshIconAngle: iconAngle,
+        loadable(state.statistic != null, RefreshButton(
+          isProcessing: state.isLoading,
+          refreshIconAngle: state.refreshIconAngle,
           callback: () => bloc.add(RefreshStatisticEvent())
         ))
       ]
@@ -168,11 +154,33 @@ class _StatsState extends State<Stats> {
     );
   }
 
+  Widget finishTime(String message) {
+    return Tooltip(
+      key: tooltipKey,
+      triggerMode: TooltipTriggerMode.manual,
+      showDuration: const Duration(seconds: 3),
+      message: message,
+      child: IconButton(
+        onPressed: () => tooltipKey.currentState?.ensureTooltipVisible(),
+        splashRadius: 10,
+        icon: const Icon(Icons.info_outline))
+    );
+  }
+
   Widget loadable(bool isLoaded, Widget child) {
     return AnimatedOpacity(
       opacity: (isLoaded) ? 1 : 0,
       duration: const Duration(milliseconds: 200),
       child: child
+    );
+  }
+
+  Widget time(StatisticState state, Time remainTime, Time workedTime, Time plan) {
+    return Text(
+      style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
+      (state.isRemainModeEnabled)
+          ? remainTime.toInvertedSignedString()
+          : '$workedTime/${plan.toString()}',
     );
   }
 }
