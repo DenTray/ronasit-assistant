@@ -31,9 +31,9 @@ class _EarnState extends State<Earn> {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                chooseCurrencyButton(state.isLoading, state.displayedCurrency?.name ?? '', state.currenciesNames, state.exchangeRate, context.read<EarnBloc>()),
-                earnContent(state.isLoading, state.formattedTodayEarned, state.formattedWeekEarned, state.formattedMonthEarned),
-                refreshButton(state.isLoading, state.refreshIconAngle, context.read<EarnBloc>())
+                chooseCurrencyButton(state, context.read<EarnBloc>()),
+                earnContent(state),
+                refreshButton(state, context.read<EarnBloc>())
               ]
             )
           );
@@ -42,14 +42,16 @@ class _EarnState extends State<Earn> {
     );
   }
 
-  Widget chooseCurrencyButton(bool isLoading, String currencyName, List<String> currencies, double quote, bloc) {
+  Widget chooseCurrencyButton(EarnState state, EarnBloc bloc) {
+    String currencyName = state.displayedCurrency?.name ?? '';
+
     return AnimatedOpacity(
-      opacity: (isLoading) ? 0 : 1,
+      opacity: (state.isLoading) ? 0 : 1,
       duration: const Duration(milliseconds: 200),
       child: ElevatedButton(
         onPressed: () => UIHelpers.displayCupertinoDialog(context, CupertinoDialog(
           fontSize: 15,
-          items: currencies,
+          items: state.currenciesNames,
           currentItem: currencyName,
           onSelectedItemChangedCallback: (index) => bloc.add(ChangeDisplayedCurrencyEvent(index))
         )),
@@ -68,7 +70,7 @@ class _EarnState extends State<Earn> {
                 maxLines: 1,
               )
             ),
-            Text('(${quote.toStringAsFixed(2)})'),
+            Text('(${state.exchangeRate.toStringAsFixed(2)})'),
             const Icon(Icons.arrow_drop_down)
           ]
         )
@@ -76,21 +78,21 @@ class _EarnState extends State<Earn> {
     );
   }
 
-  Widget refreshButton(bool isLoading, double refreshIconAngle, bloc) {
+  Widget refreshButton(EarnState state, EarnBloc bloc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         RefreshButton(
           callback: () => bloc.add(RefreshEarnEvent()),
-          isProcessing: isLoading,
-          refreshIconAngle: refreshIconAngle
+          isProcessing: state.isLoading,
+          refreshIconAngle: state.refreshIconAngle
         )
       ]
     );
   }
 
-  Widget earnContent(bool isLoading, String todayEarned, String weekEarned, String monthEarned) {
+  Widget earnContent(EarnState state) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,11 +113,11 @@ class _EarnState extends State<Earn> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            amount(isLoading, todayEarned),
+            amount(state.isLoading, state.formattedTodayEarned),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            amount(isLoading, weekEarned),
+            amount(state.isLoading, state.formattedWeekEarned),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            amount(isLoading, monthEarned)
+            amount(state.isLoading, state.formattedMonthEarned)
           ]
         )
       ]

@@ -13,7 +13,7 @@ class SettingsRepository {
       preferences.getString('preferences.locale') ?? 'en',
       preferences.getBool('preferences.is_remain_mode_enabled') ?? false,
       preferences.getDouble('preferences.rate') ?? 1.0,
-      preferences.getString('preferences.rate_currency') ?? '\$',
+      preferences.getInt('preferences.rate_currency_index') ?? 0,
       preferences.getInt('preferences.displayed_currency_symbol_index') ?? 0
     );
   }
@@ -48,10 +48,10 @@ class SettingsRepository {
     preferences.setDouble('preferences.rate', rate);
   }
 
-  updateRateCurrency(String currency) async {
+  updateRateCurrency(int rateCurrencyIndex) async {
     final preferences = await SharedPreferences.getInstance();
 
-    preferences.setString('preferences.rate_currency', currency);
+    preferences.setInt('preferences.rate_currency_index', rateCurrencyIndex);
   }
 
   factory SettingsRepository.getInstance() => _instance ??= SettingsRepository._internal();

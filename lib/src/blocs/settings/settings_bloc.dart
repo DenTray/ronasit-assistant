@@ -1,21 +1,28 @@
 import 'settings_state.dart';
 import '../../models/settings.dart';
+import '../../models/currency.dart';
 import './events/update_rate_event.dart';
 import './events/get_settings_event.dart';
 import './events/base_settings_event.dart';
 import './events/update_locale_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import './events/update_rate_currency_event.dart';
-import '../../resources/repositories/settings_repository.dart';
 import './events/update_working_days_count_event.dart';
+import '../../resources/repositories/settings_repository.dart';
+import '../../resources/repositories/currencies_repository.dart';
 
 class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
   final _repository = SettingsRepository.getInstance();
+  final _currencyRepository = CurrenciesRepository.getInstance();
 
   SettingsBloc() : super(SettingsState()) {
     on<GetSettingsEvent>((event, emit) async {
       Settings settings = await _repository.getSettings();
-      SettingsState state = SettingsState(settings: settings);
+      List<Currency> currencies = await _currencyRepository.getCurrencies();
+      SettingsState state = SettingsState(
+        settings: settings,
+        currenciesNames: currencies.map((Currency currency) => currency.name).toList()
+      );
 
       emit(state);
     });
@@ -56,7 +63,7 @@ class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
     });
 
     on<UpdateRateCurrencyEvent>((event, emit) async {
-      await _repository.updateRateCurrency(event.value);
+      await _repository.updateRateCurrency(event.index);
 
       add(GetSettingsEvent());
     });
