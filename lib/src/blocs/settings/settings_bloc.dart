@@ -19,12 +19,11 @@ class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
     on<GetSettingsEvent>((event, emit) async {
       Settings settings = await _repository.getSettings();
       List<Currency> currencies = await _currenciesRepository.getCurrencies();
-      SettingsState state = SettingsState(
+
+      emit(state.copyWith(
         settings: settings,
         currenciesNames: currencies.map((Currency currency) => currency.name).toList()
-      );
-
-      emit(state);
+      ));
     });
 
     on<UpdateWorkingDaysCountEvent>((event, emit) async {
