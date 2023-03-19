@@ -24,6 +24,7 @@
   "placeholderEnterUsername": "Введите username",
   "textAuthorization": "Авторизация",
   "textCurrency": "Валюта",
+  "textFinishTime": "Ваш рабочий день закончится в ",
   "textEnterName": "Введите Ваше имя",
   "textLanguage": "Язык",
   "textPreferredDaysCount": "Количество рабочих дней",
