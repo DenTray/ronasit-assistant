@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ronas_assistant/src/models/report.dart';
 import 'package:ronas_assistant/src/support/types/time.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:ronas_assistant/src/ui/detailed_stats.dart';
 import 'package:ronas_assistant/src/ui/shared/refresh_button.dart';
 import 'package:ronas_assistant/src/blocs/stats/statistic_bloc.dart';
 import 'package:ronas_assistant/src/blocs/stats/statistic_state.dart';
@@ -68,11 +71,11 @@ class _StatsState extends State<Stats> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            time(state, state.todayRemainTime, state.todayTime, state.dayPlan),
+            time(state, state.todayRemainTime, state.todayTime, state.dayPlan, state.statistic!.reports.today, AppLocalizations.of(context)!.textToday),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            time(state, state.weekRemainTime, state.weekTime, state.weekPlan),
+            time(state, state.weekRemainTime, state.weekTime, state.weekPlan, state.statistic!.reports.week, AppLocalizations.of(context)!.textWeek),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
-            time(state, state.monthRemainTime, state.monthTime, state.monthPlan),
+            time(state, state.monthRemainTime, state.monthTime, state.monthPlan, state.statistic!.reports.month, AppLocalizations.of(context)!.textMonth),
           ]
         ),
         const Padding(padding: EdgeInsets.only(left: 20, right: 20)),
@@ -80,7 +83,7 @@ class _StatsState extends State<Stats> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            (state.todayRemainTime.isPositive) ? finishTime(AppLocalizations.of(context)!.textFinishTime + state.finishTime) : completeIcon(!state.todayRemainTime.isPositive),
+            (state.todayRemainTime.isPositive) ? finishTime(AppLocalizations.of(context)!.textFinishTime + state.finishTime) : completeIcon(state.todayRemainTime.isNegative || state.todayRemainTime.isEmpty),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
             completeIcon(!state.weekRemainTime.isPositive),
             const Padding(padding: EdgeInsets.only(top: 10, bottom: 10)),
@@ -175,12 +178,27 @@ class _StatsState extends State<Stats> {
     );
   }
 
-  Widget time(StatisticState state, Time remainTime, Time workedTime, Time plan) {
-    return Text(
-      style: TextStyle(color: (state.isLoading) ? Colors.grey : Colors.black),
-      (state.isRemainModeEnabled)
-          ? remainTime.toInvertedSignedString()
-          : '$workedTime/${plan.toString()}',
+  Widget time(
+      StatisticState state,
+      Time remainTime,
+      Time workedTime,
+      Time plan,
+      List<Report> reports,
+      String period
+  ) {
+    return RichText(
+      text: TextSpan(
+        text: (state.isRemainModeEnabled) ? remainTime.toInvertedSignedString() : '$workedTime/${plan.toString()}',
+        style: TextStyle(fontSize: 20, fontFamily: 'SourceSerif', fontWeight: FontWeight.bold, color: (state.isLoading) ? Colors.grey : Colors.blue),
+        recognizer: TapGestureRecognizer()..onTap = () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailedStats(reports: reports, period: period)
+            ),
+          );
+        }
+      )
     );
   }
 }

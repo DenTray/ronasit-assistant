@@ -63,6 +63,7 @@ class SettingsBloc extends Bloc<BaseSettingsEvent, SettingsState> {
 
     on<UpdateRateCurrencyEvent>((event, emit) async {
       await _repository.updateRateCurrency(event.index);
+      _currenciesRepository.resetCache();
 
       add(GetSettingsEvent());
     });
