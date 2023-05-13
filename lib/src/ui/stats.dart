@@ -164,6 +164,8 @@ class _StatsState extends State<Stats> {
       showDuration: const Duration(seconds: 3),
       message: message,
       child: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: BoxConstraints(),
         onPressed: () => tooltipKey.currentState?.ensureTooltipVisible(),
         splashRadius: 10,
         icon: const Icon(Icons.info_outline))
