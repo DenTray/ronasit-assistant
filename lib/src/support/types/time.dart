@@ -3,14 +3,17 @@ class Time {
   int _minutes = 0;
   bool _isPositive = true;
   bool _isNegative = false;
+  bool _isEmpty = false;
 
   bool get isPositive => _isPositive;
   bool get isNegative => _isNegative;
+  bool get isEmpty => _isEmpty;
 
   Time({ int hours = 0, int minutes = 0 }) {
     _hours = hours;
     _minutes = minutes;
-    _isPositive = _hours > 0 && _minutes > 0;
+    _isEmpty = _hours == 0 && _minutes == 0;
+    _isPositive = _hours > 0 || _hours == 0 && _minutes > 0;
     _isNegative = _hours < 0 || _hours == 0 && _minutes < 0;
   }
 

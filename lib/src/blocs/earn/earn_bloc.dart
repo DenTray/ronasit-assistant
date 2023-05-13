@@ -30,15 +30,16 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
       User user = await _usersRepository.getCurrentUser();
       Statistic statistic = await _statisticsRepository.getTime(user.userName);
       List<Currency> currencies = await _currenciesRepository.getCurrencies();
+      Currency rateCurrency = currencies[settings.rateCurrencyIndex];
       Currency displayedCurrency = currencies[settings.displayedCurrencySymbolIndex];
-      //TODO get rate currency
-      Exchange exchange = await _currenciesRepository.getExchange('USD', displayedCurrency.symbol);
+      Exchange exchange = await _currenciesRepository.getExchange(rateCurrency.symbol, displayedCurrency.symbol);
 
       emit(state.copyWith(
         statistic: statistic,
         rate: settings.rate,
         currencies: currencies,
         displayedCurrency: displayedCurrency,
+        rateCurrency: rateCurrency,
         exchangeRate: exchange.rate
       ));
 
@@ -55,8 +56,7 @@ class EarnBloc extends Bloc<BaseEarnEvent, EarnState> {
     on<ChangeDisplayedCurrencyEvent>((event, emit) async {
       Currency displayedCurrency = state.currencies![event.currencyIndex];
 
-      //TODO get rate currency
-      Exchange exchange = await _currenciesRepository.fetchExchange('USD', displayedCurrency.symbol);
+      Exchange exchange = await _currenciesRepository.fetchExchange(state.rateCurrency!.symbol, displayedCurrency.symbol);
       await _settingsRepository.updateDisplayedCurrencyIndex(event.currencyIndex);
 
       emit(state.copyWith(

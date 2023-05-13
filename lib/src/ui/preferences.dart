@@ -23,7 +23,6 @@ class Preferences extends StatefulWidget {
 class _PreferencesState extends State<Preferences> {
   final List <int> _daysCount = <int> [1, 2, 3, 4, 5, 6, 7];
   final List <String> _locales = <String> ['en', 'ru'];
-  final List <String> _currencies = <String> ['\$', '₽'];
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +39,7 @@ class _PreferencesState extends State<Preferences> {
               const Divider(height: 0),
               rateSetting(state.rate, context.read<SettingsBloc>()),
               const Divider(height: 0),
-              currencySetting(context, context.read<SettingsBloc>(), state.rateCurrency),
+              currencySetting(context, context.read<SettingsBloc>(), state),
             ])
           );
         }
@@ -60,14 +59,15 @@ class _PreferencesState extends State<Preferences> {
     );
   }
 
-  Widget currencySetting(context, bloc, currentValue) {
+  Widget currencySetting(context, SettingsBloc bloc, SettingsState state) {
     return preferenceItem(
       () => UIHelpers.displayCupertinoDialog(
         context,
         CupertinoDialog(
-          items: _currencies,
-          currentItem: currentValue,
-          onSelectedItemChangedCallback: (index) => bloc.add(UpdateRateCurrencyEvent(_currencies[index]))
+          fontSize: 15,
+          items: state.currenciesNames,
+          currentItem: state.rateCurrency,
+          onSelectedItemChangedCallback: (index) => bloc.add(UpdateRateCurrencyEvent(index))
         )
       ),
       Icons.currency_exchange,

@@ -15,6 +15,7 @@ class EarnState {
 
   int? displayedCurrencyIndex;
   Currency? displayedCurrency;
+  Currency? rateCurrency;
 
   double todayEarned = 0;
   String formattedTodayEarned = '0';
@@ -30,6 +31,7 @@ class EarnState {
     double rate = 1,
     List<Currency>? currencies,
     Currency? displayedCurrency,
+    Currency? rateCurrency,
     double exchangeRate = 1,
   }) {
     this.rate = rate;
@@ -41,6 +43,10 @@ class EarnState {
 
     if (displayedCurrency != null) {
       this.displayedCurrency = displayedCurrency;
+    }
+
+    if (rateCurrency != null) {
+      this.rateCurrency = rateCurrency;
     }
 
     if (currencies != null) {
@@ -71,12 +77,14 @@ class EarnState {
     double? rate,
     double? exchangeRate,
     List<Currency>? currencies,
-    Currency? displayedCurrency
+    Currency? displayedCurrency,
+    Currency? rateCurrency,
   }) {
     return EarnState(
       rate: rate ?? this.rate,
       exchangeRate: exchangeRate ?? this.exchangeRate,
       displayedCurrency: displayedCurrency ?? this.displayedCurrency,
+      rateCurrency: rateCurrency ?? this.rateCurrency,
       isLoading: isLoading ?? this.isLoading,
       statistic: statistic ?? this.statistic,
       currencies: currencies ?? this.currencies,
