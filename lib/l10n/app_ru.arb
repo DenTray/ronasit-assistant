@@ -1,6 +1,7 @@
 {
   "appBarAuthorization": "Авторизация",
   "appBarPreferences": "Настройки пользователя",
+  "appBarArchive": "Журнал",
   "appBarEarned": "Заработано",
   "appBarProfile": "Профиль",
   "appBarStats": "Статистика",

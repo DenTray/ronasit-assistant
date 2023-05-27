@@ -1,6 +1,7 @@
 {
   "appBarAuthorization": "Authorization",
   "appBarPreferences": "Preferences",
+  "appBarArchive": "Archive",
   "appBarEarned": "Earned",
   "appBarProfile": "Profile",
   "appBarStats": "Stats",

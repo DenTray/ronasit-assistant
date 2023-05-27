@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
+
 import '../../../auth/secrets.dart';
 import 'package:ronas_assistant/src/support/helpers.dart';
 import 'package:ronas_assistant/src/models/statistic.dart';
 import 'package:ronas_assistant/src/resources/api_providers/base_api_provider.dart';
+import '../../models/archive_statistic.dart';
 
 class RonasITApiProvider extends BaseApiProvider {
   static RonasITApiProvider? _instance;
@@ -18,15 +21,31 @@ class RonasITApiProvider extends BaseApiProvider {
   Future<Statistic> fetchTime(String username) async {
     final response = await apiCall('get', '/report/$username', authRequired: true);
 
-    if (response.statusCode >= 400) {
-      throw Exception(response.body);
-    }
-
     return Statistic.fromJson(jsonDecode(response.body));
   }
 
-  dynamic userStat(String username) {
-    return apiCall('get', '/stat/$username', authRequired: true);
+  Future<ArchiveStatistic> userStat(String username, DateTime from, DateTime to) async {
+    String fromFilter = DateFormat('d-M-y').format(from);
+    String toFilter = DateFormat('d-M-y').format(to);
+
+    bool isSingleDayStats = fromFilter == toFilter;
+
+    var body = (isSingleDayStats)
+      ? {
+        'date': DateFormat('y-M-d').format(from)
+      }
+      : {
+        'date_range': jsonEncode({
+          'start': fromFilter,
+          'end': toFilter
+        })
+      };
+
+    final response = await apiCall('get', '/report/$username', authRequired: true, body: body);
+
+    return (isSingleDayStats)
+      ? ArchiveStatistic.fromSingleStatistic(jsonDecode(response.body))
+      : ArchiveStatistic.fromJson(jsonDecode(response.body));
   }
 
   dynamic _auth() {
@@ -47,7 +66,13 @@ class RonasITApiProvider extends BaseApiProvider {
       headers['Authorization'] = 'Bearer $_token';
     }
 
-    return makeRequest(type, url, params: body, headers: headers);
+    var response = await makeRequest(type, url, params: body, headers: headers);
+
+    if (response.statusCode >= 400) {
+      throw Exception(response.body);
+    }
+
+    return response;
   }
 
   _setToken() async {

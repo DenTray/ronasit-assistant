@@ -48,4 +48,8 @@ class Time {
   Time sub(Time time) {
     return Time.fromDouble(hours: toDouble() - time.toDouble());
   }
+
+  Time add(double hours) {
+    return Time.fromDouble(hours: toDouble() - hours);
+  }
 }

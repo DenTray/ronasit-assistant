@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ronas_assistant/src/ui/earn.dart';
 import 'package:ronas_assistant/src/ui/stats.dart';
+import 'package:ronas_assistant/src/ui/archive.dart';
 import 'package:ronas_assistant/src/ui/profile.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -17,6 +18,7 @@ class _BaseState extends State<Base> {
   static const List<Widget> _widgetOptions = <Widget>[
     Stats(),
     Earn(),
+    Archive(),
     Profile()
   ];
 
@@ -33,6 +35,10 @@ class _BaseState extends State<Base> {
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: const Icon(Icons.home),
@@ -43,13 +49,14 @@ class _BaseState extends State<Base> {
             label: AppLocalizations.of(context)!.appBarEarned,
           ),
           BottomNavigationBarItem(
+            icon: const Icon(Icons.calendar_month_outlined),
+            label: AppLocalizations.of(context)!.appBarArchive,
+          ),
+          BottomNavigationBarItem(
             icon: const Icon(Icons.person),
             label: AppLocalizations.of(context)!.appBarProfile,
           )
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        onTap: _onItemTapped
+        ]
       )
     );
   }

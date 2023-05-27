@@ -16,6 +16,10 @@ class StatisticsRepository {
     return _statistic;
   }
 
+  getTimeByDateRange(String userName, DateTime from, DateTime to) {
+    return ronasITApiProvider.userStat(userName, from, to);
+  }
+
   Future<Statistic> refreshTime(String userName) async {
     Statistic statistic = await ronasITApiProvider.fetchTime(userName);
 

@@ -8,6 +8,8 @@ class Report {
   late double _hours;
   String? _assignmentName;
 
+  Report(this._user, this._source, this._project, this._date, this._hours, this._assignmentName);
+
   Report.fromJson(Map<String, dynamic> parsedJson) {
     _user = parsedJson['user'];
     _source = parsedJson['source'];
