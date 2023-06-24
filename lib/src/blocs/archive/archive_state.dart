@@ -5,14 +5,26 @@ class ArchiveState {
   late DateTime fromDate;
   late DateTime toDate;
   ArchiveStatistic? statistic;
+  late double rate = 1;
+  double exchangeRate = 1;
+  double earned = 1;
 
   ArchiveState({
     bool isLoading = true,
     ArchiveStatistic? statistic = null,
     DateTime? fromDate = null,
     DateTime? toDate = null,
+    double rate = 1,
+    double exchangeRate = 1,
   }) {
     this.isLoading = isLoading;
+
+    this.rate = rate;
+    this.exchangeRate = exchangeRate;
+
+    if (statistic?.totalHours != null) {
+      this.earned = statistic!.totalHours.toDouble() * rate * exchangeRate;
+    }
 
     if (statistic != null) {
       this.statistic = statistic;
@@ -27,10 +39,14 @@ class ArchiveState {
     ArchiveStatistic? statistic = null,
     DateTime? fromDate = null,
     DateTime? toDate = null,
+    double? exchangeRate,
+    double? rate,
   }) {
     return ArchiveState(
       isLoading: isLoading ?? this.isLoading,
       statistic: statistic ?? this.statistic,
+      exchangeRate: exchangeRate ?? this.exchangeRate,
+      rate: rate ?? this.rate,
       fromDate: fromDate ?? this.fromDate,
       toDate: toDate ?? this.toDate
     );

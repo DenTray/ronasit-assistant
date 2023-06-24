@@ -40,7 +40,7 @@ class _ArchiveState extends State<Archive> {
                   children: [
                     datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading),
                     const Padding(padding: EdgeInsets.all(10)),
-                    (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!),
+                    (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
                   ]
                 ),
                 fetchButton(context.read<ArchiveBloc>(), state.isLoading)
@@ -83,8 +83,9 @@ class _ArchiveState extends State<Archive> {
     );
   }
 
-  Widget archiveContent(ArchiveStatistic statistic) {
+  Widget archiveContent(ArchiveStatistic statistic, double earned) {
     List<Widget> items = [Text('${statistic.totalHours}/${statistic.totalPlan}')];
+    items.add(Text(earned.roundToDouble().toString()));
 
     statistic.projects.forEach((element) {
       Widget projectNameText = AutoSizeText.rich(
