@@ -8,20 +8,17 @@ class ArchiveState {
   late double rate = 1;
   double exchangeRate = 1;
   double earned = 1;
+  bool isCustomModeEnabled = false;
 
   ArchiveState({
-    bool isLoading = true,
+    bool this.isLoading = true,
     ArchiveStatistic? statistic = null,
     DateTime? fromDate = null,
     DateTime? toDate = null,
-    double rate = 1,
-    double exchangeRate = 1,
+    double this.rate = 1,
+    double this.exchangeRate = 1,
+    bool this.isCustomModeEnabled = false
   }) {
-    this.isLoading = isLoading;
-
-    this.rate = rate;
-    this.exchangeRate = exchangeRate;
-
     if (statistic?.totalHours != null) {
       this.earned = statistic!.totalHours.toDouble() * rate * exchangeRate;
     }
@@ -41,6 +38,7 @@ class ArchiveState {
     DateTime? toDate = null,
     double? exchangeRate,
     double? rate,
+    bool? isCustomModeEnabled,
   }) {
     return ArchiveState(
       isLoading: isLoading ?? this.isLoading,
@@ -48,7 +46,8 @@ class ArchiveState {
       exchangeRate: exchangeRate ?? this.exchangeRate,
       rate: rate ?? this.rate,
       fromDate: fromDate ?? this.fromDate,
-      toDate: toDate ?? this.toDate
+      toDate: toDate ?? this.toDate,
+      isCustomModeEnabled: isCustomModeEnabled ?? this.isCustomModeEnabled
     );
   }
 }

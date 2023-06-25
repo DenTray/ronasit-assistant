@@ -6,7 +6,7 @@ class NetworkButton extends StatefulWidget {
   final bool isProcessing;
   final IconData icon;
   final String text;
-  final String loadingText;
+  final String? loadingText;
 
   const NetworkButton({
     Key? key,
@@ -14,7 +14,7 @@ class NetworkButton extends StatefulWidget {
     required this.icon,
     required this.isProcessing,
     required this.text,
-    required this.loadingText,
+    this.loadingText,
   }) : super(key: key);
 
   @override
@@ -28,17 +28,15 @@ class _NetworkButtonState extends State<NetworkButton> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        ElevatedButton(
-          onPressed: widget.callback,
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all((widget.isProcessing) ? Colors.grey : Colors.blue),
-            fixedSize: MaterialStateProperty.all(const Size.fromWidth(260))
-          ),
+        CupertinoButton(
+          onPressed: (widget.isProcessing) ? null : widget.callback,
+          color: Colors.blue,
+          padding: EdgeInsets.only(left: 15.0, right: 15.0),
           child: Row(
             children: [
               Icon(widget.icon),
               const Padding(padding: EdgeInsets.only(left: 20)),
-              Text((widget.isProcessing) ? widget.loadingText : widget.text)
+              Text((widget.isProcessing && widget.loadingText != null) ? widget.loadingText! : widget.text)
             ]
           )
         )
