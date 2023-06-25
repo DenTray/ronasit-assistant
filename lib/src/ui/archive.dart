@@ -43,14 +43,8 @@ class _ArchiveState extends State<Archive> {
               children: [
                 datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
                 (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Divider(),
-                    const Padding(padding: EdgeInsets.all(10)),
-                    (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
-                  ]
-                ),
+                Divider(),
+                (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
                 Divider(),
                 fetchButton(context.read<ArchiveBloc>(), state.isLoading)
               ]
@@ -113,29 +107,27 @@ class _ArchiveState extends State<Archive> {
   }
 
   Widget archiveContent(ArchiveStatistic statistic, double earned) {
-    List<Widget> items = [];
-
-    statistic.projects.forEach((element) {
-      Widget projectNameText = AutoSizeText.rich(
-        TextSpan(text: element.project),
-        style: const TextStyle(fontSize: 17),
-        minFontSize: 1,
-        maxLines: 1,
-      );
-
-      items.add(Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          projectNameText,
-          Text(Time.fromDouble(hours: element.hours).toString()),
-        ],
-      ));
-    });
-
-    return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
-      child: Column(
-        children: items
+    return Expanded(
+      child: SingleChildScrollView(
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: statistic.projects.length,
+          itemBuilder: (context, index) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AutoSizeText.rich(
+                  TextSpan(text: statistic.projects[index].project),
+                  style: const TextStyle(fontSize: 17),
+                  minFontSize: 1,
+                  maxLines: 1,
+                ),
+                Text(Time.fromDouble(hours: statistic.projects[index].hours).toString()),
+              ]
+            );
+          }
+        )
       )
     );
   }
