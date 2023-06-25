@@ -83,7 +83,7 @@ class ArchiveBloc extends Bloc<BaseArchiveEvent, ArchiveState> {
 
       emit(this.state.copyWith(
           isCustomModeEnabled: false,
-          fromDate: now.subtract(Duration(days: DateTime.daysPerWeek + now.weekday + 1)),
+          fromDate: now.subtract(Duration(days: DateTime.daysPerWeek + now.weekday - 1)),
           toDate: now.subtract(Duration(days: now.weekday))
       ));
 

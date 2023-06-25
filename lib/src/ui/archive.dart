@@ -41,20 +41,43 @@ class _ArchiveState extends State<Archive> {
             body: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
+                datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
+                (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
+                    Divider(),
                     const Padding(padding: EdgeInsets.all(10)),
                     (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
                   ]
                 ),
+                Divider(),
                 fetchButton(context.read<ArchiveBloc>(), state.isLoading)
               ]
             )
           );
         }
       )
+    );
+  }
+
+  Widget aggregations(ArchiveBloc bloc, ArchiveStatistic statistic, double earned) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.money),
+            Text(earned.roundToDouble().toString())
+          ]
+        ),
+        Row(
+          children: [
+            const Icon(Icons.bar_chart),
+            Text('${statistic.totalHours}/${statistic.totalPlan}')
+          ]
+        ),
+      ],
     );
   }
 
@@ -90,8 +113,7 @@ class _ArchiveState extends State<Archive> {
   }
 
   Widget archiveContent(ArchiveStatistic statistic, double earned) {
-    List<Widget> items = [Text('${statistic.totalHours}/${statistic.totalPlan}')];
-    items.add(Text(earned.roundToDouble().toString()));
+    List<Widget> items = [];
 
     statistic.projects.forEach((element) {
       Widget projectNameText = AutoSizeText.rich(

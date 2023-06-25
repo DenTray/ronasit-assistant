@@ -50,6 +50,6 @@ class Time {
   }
 
   Time add(double hours) {
-    return Time.fromDouble(hours: toDouble() - hours);
+    return Time.fromDouble(hours: toDouble() + hours);
   }
 }
