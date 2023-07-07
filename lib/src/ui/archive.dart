@@ -12,11 +12,14 @@ import 'package:ronas_assistant/src/blocs/archive/events/choose_custom_range_eve
 import 'package:ronas_assistant/src/blocs/archive/events/fetch_archive_event.dart';
 import 'package:ronas_assistant/src/blocs/archive/events/range_events/choose_last_year_range_event.dart';
 import 'package:ronas_assistant/src/blocs/archive/events/range_events/choose_yesterday_range_event.dart';
+import 'package:ronas_assistant/src/blocs/archive/events/sorting_button_clicked_event.dart';
+import 'package:ronas_assistant/src/blocs/archive/events/sorting_window_state_changed_event.dart';
 import 'package:ronas_assistant/src/models/archive_statistic.dart';
 import 'package:ronas_assistant/src/support/ui_helpers.dart';
 import 'package:ronas_assistant/src/ui/shared/network_button.dart';
 import '../blocs/archive/archive_bloc.dart';
 import '../blocs/archive/archive_state.dart';
+import '../blocs/archive/events/apply_sort_event.dart';
 import '../blocs/archive/events/range_events/choose_last_month_range_event.dart';
 import '../blocs/archive/events/range_events/choose_last_week_range_event.dart';
 import '../blocs/archive/events/range_events/choose_this_year_range_event.dart';
@@ -37,16 +40,51 @@ class _ArchiveState extends State<Archive> {
       child: BlocBuilder<ArchiveBloc, ArchiveState>(
         builder: (context, state) {
           return Scaffold(
-            appBar: AppBar(title: Text(AppLocalizations.of(context)!.appBarArchive)),
-            body: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            appBar: AppBar(
+              title: Text(AppLocalizations.of(context)!.appBarArchive),
+              actions: [
+                IconButton(
+                  onPressed: () => context.read<ArchiveBloc>().add(SortingButtonClickedEvent()),
+                  icon: const Icon(Icons.sort)
+                )
+              ],
+            ),
+            body: Stack(
               children: [
-                datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
-                (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
-                Divider(),
-                (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
-                Divider(),
-                fetchButton(context.read<ArchiveBloc>(), state.isLoading)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
+                    Divider(),
+                    (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
+                    Divider(),
+                    (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
+                    Divider(),
+                    fetchButton(context.read<ArchiveBloc>(), state.isLoading)
+                  ]
+                ),
+                AnimatedOpacity(
+                  opacity: state.isSortingWindowStateChanging ? 1 : 0,
+                  onEnd: () => context.read<ArchiveBloc>().add(SortingWindowStateChangedEvent()),
+                  duration: const Duration(milliseconds: 200),
+                  child: Visibility(visible: state.isSortingWindowOpened, child: Align(
+                    alignment: Alignment.topRight,
+                    child: Card(
+                      child: SizedBox(
+                        height: 200,
+                        width: 190,
+                        child: Column(
+                          children: [
+                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectAZ, 0, state.sortingIndex),
+                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectZA, 1, state.sortingIndex),
+                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeAZ, 2, state.sortingIndex),
+                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeZA, 3, state.sortingIndex),
+                          ]
+                        )
+                      )
+                    )
+                  ))
+                )
               ]
             )
           );
@@ -110,6 +148,7 @@ class _ArchiveState extends State<Archive> {
     return Expanded(
       child: SingleChildScrollView(
         child: ListView.builder(
+          padding: EdgeInsets.all(15),
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
           itemCount: statistic.projects.length,
@@ -138,6 +177,23 @@ class _ArchiveState extends State<Archive> {
       icon: Icons.access_time,
       text: AppLocalizations.of(context)!.buttonRange,
       isProcessing: isProcessing
+    );
+  }
+
+  Widget sortOption(ArchiveBloc bloc, String label, int index, int currentSortingIndex) {
+    return OutlinedButton(
+      onPressed: () => bloc.add(ApplySortEvent(index)),
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(style: BorderStyle.none),
+        fixedSize: Size(MediaQuery.of(context).size.width, 44)
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label),
+          Opacity(opacity: (index == currentSortingIndex) ? 1 : 0, child: Icon(Icons.done))
+        ]
+      )
     );
   }
 

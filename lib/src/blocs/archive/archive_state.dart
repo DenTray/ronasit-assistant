@@ -5,10 +5,13 @@ class ArchiveState {
   late DateTime fromDate;
   late DateTime toDate;
   ArchiveStatistic? statistic;
-  late double rate = 1;
+  double rate = 1;
+  int sortingIndex = 0;
   double exchangeRate = 1;
   double earned = 1;
   bool isCustomModeEnabled = false;
+  bool isSortingWindowStateChanging = false;
+  bool isSortingWindowOpened = false;
 
   ArchiveState({
     bool this.isLoading = true,
@@ -17,7 +20,10 @@ class ArchiveState {
     DateTime? toDate = null,
     double this.rate = 1,
     double this.exchangeRate = 1,
-    bool this.isCustomModeEnabled = false
+    int this.sortingIndex = 0,
+    bool this.isCustomModeEnabled = false,
+    bool this.isSortingWindowOpened = false,
+    bool this.isSortingWindowStateChanging = false,
   }) {
     if (statistic?.totalHours != null) {
       this.earned = statistic!.totalHours.toDouble() * rate * exchangeRate;
@@ -38,7 +44,10 @@ class ArchiveState {
     DateTime? toDate = null,
     double? exchangeRate,
     double? rate,
+    int? sortingIndex,
     bool? isCustomModeEnabled,
+    bool? isSortingWindowOpened,
+    bool? isSortingWindowStateChanging,
   }) {
     return ArchiveState(
       isLoading: isLoading ?? this.isLoading,
@@ -47,7 +56,10 @@ class ArchiveState {
       rate: rate ?? this.rate,
       fromDate: fromDate ?? this.fromDate,
       toDate: toDate ?? this.toDate,
-      isCustomModeEnabled: isCustomModeEnabled ?? this.isCustomModeEnabled
+      sortingIndex: sortingIndex ?? this.sortingIndex,
+      isCustomModeEnabled: isCustomModeEnabled ?? this.isCustomModeEnabled,
+      isSortingWindowOpened: isSortingWindowOpened ?? this.isSortingWindowOpened,
+      isSortingWindowStateChanging: isSortingWindowStateChanging ?? this.isSortingWindowStateChanging,
     );
   }
 }
