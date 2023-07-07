@@ -20,6 +20,7 @@ import 'package:ronas_assistant/src/ui/shared/network_button.dart';
 import '../blocs/archive/archive_bloc.dart';
 import '../blocs/archive/archive_state.dart';
 import '../blocs/archive/events/apply_sort_event.dart';
+import '../blocs/archive/events/hide_sorting_window_event.dart';
 import '../blocs/archive/events/range_events/choose_last_month_range_event.dart';
 import '../blocs/archive/events/range_events/choose_last_week_range_event.dart';
 import '../blocs/archive/events/range_events/choose_this_year_range_event.dart';
@@ -51,17 +52,20 @@ class _ArchiveState extends State<Archive> {
             ),
             body: Stack(
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
-                    Divider(),
-                    (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
-                    Divider(),
-                    (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
-                    Divider(),
-                    fetchButton(context.read<ArchiveBloc>(), state.isLoading)
-                  ]
+                GestureDetector(
+                  onTap: () => context.read<ArchiveBloc>().add(HideSortingWindowEvent()),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
+                      Divider(),
+                      (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
+                      Divider(),
+                      (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
+                      Divider(),
+                      fetchButton(context.read<ArchiveBloc>(), state.isLoading)
+                    ]
+                  )
                 ),
                 AnimatedOpacity(
                   opacity: state.isSortingWindowStateChanging ? 1 : 0,

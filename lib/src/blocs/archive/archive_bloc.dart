@@ -20,6 +20,7 @@ import 'package:ronas_assistant/src/resources/repositories/statistics_repository
 import 'events/change_date_from_event.dart';
 import 'events/choose_custom_range_event.dart';
 import 'events/fetch_archive_event.dart';
+import 'events/hide_sorting_window_event.dart';
 import 'events/range_events/choose_last_year_range_event.dart';
 import 'events/range_events/choose_this_year_range_event.dart';
 import 'events/sorting_button_clicked_event.dart';
@@ -90,6 +91,13 @@ class ArchiveBloc extends Bloc<BaseArchiveEvent, ArchiveState> {
     on<SortingWindowStateChangedEvent>((event, emit) async {
       emit(state.copyWith(
         isSortingWindowOpened: state.isSortingWindowStateChanging
+      ));
+    });
+
+    on<HideSortingWindowEvent>((event, emit) async {
+      emit(state.copyWith(
+        isSortingWindowOpened: false,
+        isSortingWindowStateChanging: false
       ));
     });
 
