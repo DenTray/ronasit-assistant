@@ -16,7 +16,6 @@ import 'package:ronas_assistant/src/blocs/archive/events/sorting_button_clicked_
 import 'package:ronas_assistant/src/blocs/archive/events/sorting_window_state_changed_event.dart';
 import 'package:ronas_assistant/src/models/archive_statistic.dart';
 import 'package:ronas_assistant/src/support/ui_helpers.dart';
-import 'package:ronas_assistant/src/ui/shared/network_button.dart';
 import '../blocs/archive/archive_bloc.dart';
 import '../blocs/archive/archive_state.dart';
 import '../blocs/archive/events/apply_sort_event.dart';
@@ -55,15 +54,13 @@ class _ArchiveState extends State<Archive> {
                 GestureDetector(
                   onTap: () => context.read<ArchiveBloc>().add(HideSortingWindowEvent()),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
-                      Divider(),
-                      (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : SizedBox(),
-                      Divider(),
-                      (state.isLoading) ? CircularProgressIndicator() : archiveContent(state.statistic!, state.earned),
-                      Divider(),
-                      fetchButton(context.read<ArchiveBloc>(), state.isLoading)
+                      const Divider(),
+                      (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : const SizedBox(),
+                      (!state.isLoading) ? const Divider() : const SizedBox(),
+                      (state.isLoading) ? const CircularProgressIndicator() : archiveContent(state.statistic!, state.earned)
                     ]
                   )
                 ),
@@ -71,23 +68,26 @@ class _ArchiveState extends State<Archive> {
                   opacity: state.isSortingWindowStateChanging ? 1 : 0,
                   onEnd: () => context.read<ArchiveBloc>().add(SortingWindowStateChangedEvent()),
                   duration: const Duration(milliseconds: 200),
-                  child: Visibility(visible: state.isSortingWindowOpened, child: Align(
-                    alignment: Alignment.topRight,
-                    child: Card(
-                      child: SizedBox(
-                        height: 200,
-                        width: 190,
-                        child: Column(
-                          children: [
-                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectAZ, 0, state.sortingIndex),
-                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectZA, 1, state.sortingIndex),
-                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeAZ, 2, state.sortingIndex),
-                            sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeZA, 3, state.sortingIndex),
-                          ]
+                  child: Visibility(
+                    visible: state.isSortingWindowOpened,
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Card(
+                        child: SizedBox(
+                          height: 200,
+                          width: 190,
+                          child: Column(
+                            children: [
+                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectAZ, 0, state.sortingIndex),
+                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectZA, 1, state.sortingIndex),
+                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeAZ, 2, state.sortingIndex),
+                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeZA, 3, state.sortingIndex),
+                            ]
+                          )
                         )
                       )
                     )
-                  ))
+                  )
                 )
               ]
             )
@@ -139,11 +139,16 @@ class _ArchiveState extends State<Archive> {
 
   Widget datePicker(ArchiveBloc bloc, DateTime fromDate, DateTime toDate, bool isLoading, bool isCustomModeEnabled) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        IconButton(
+          onPressed: () => _showActionSheet(context, bloc),
+          icon: const Icon(Icons.arrow_drop_down)
+        ),
         dateButton(bloc, fromDate, isLoading, true, isCustomModeEnabled),
         const Text(' - '),
-        dateButton(bloc, toDate, isLoading, false, isCustomModeEnabled)
+        dateButton(bloc, toDate, isLoading, false, isCustomModeEnabled),
+        const Padding(padding: EdgeInsets.only(right: 10))
       ]
     );
   }
@@ -172,15 +177,6 @@ class _ArchiveState extends State<Archive> {
           }
         )
       )
-    );
-  }
-
-  Widget fetchButton(ArchiveBloc bloc, bool isProcessing) {
-    return NetworkButton(
-      callback: () => _showActionSheet(context, bloc),
-      icon: Icons.access_time,
-      text: AppLocalizations.of(context)!.buttonRange,
-      isProcessing: isProcessing
     );
   }
 
