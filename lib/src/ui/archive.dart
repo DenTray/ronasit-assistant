@@ -51,48 +51,54 @@ class _ArchiveState extends State<Archive> {
             ),
             body: Stack(
               children: [
-                GestureDetector(
-                  onTap: () => context.read<ArchiveBloc>().add(HideSortingWindowEvent()),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
-                      const Divider(),
-                      (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : const SizedBox(),
-                      (!state.isLoading) ? const Divider() : const SizedBox(),
-                      (state.isLoading) ? const CircularProgressIndicator() : archiveContent(state.statistic!, state.earned)
-                    ]
-                  )
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    datePicker(context.read<ArchiveBloc>(), state.fromDate, state.toDate, state.isLoading, state.isCustomModeEnabled),
+                    const Divider(),
+                    (!state.isLoading) ? aggregations(context.read<ArchiveBloc>(), state.statistic!, state.earned) : const SizedBox(),
+                    (state.isLoading) ? const Padding(padding: EdgeInsets.only(top: 200)) : const Divider(),
+                    (state.isLoading)
+                        ? const CircularProgressIndicator()
+                        : archiveContent(state.statistic!, state.earned),
+                  ]
                 ),
-                AnimatedOpacity(
-                  opacity: state.isSortingWindowStateChanging ? 1 : 0,
-                  onEnd: () => context.read<ArchiveBloc>().add(SortingWindowStateChangedEvent()),
-                  duration: const Duration(milliseconds: 200),
-                  child: Visibility(
-                    visible: state.isSortingWindowOpened,
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Card(
-                        child: SizedBox(
-                          height: 200,
-                          width: 190,
-                          child: Column(
-                            children: [
-                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectAZ, 0, state.sortingIndex),
-                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortProjectZA, 1, state.sortingIndex),
-                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeAZ, 2, state.sortingIndex),
-                              sortOption(context.read<ArchiveBloc>(), AppLocalizations.of(context)!.buttonSortTimeZA, 3, state.sortingIndex),
-                            ]
-                          )
-                        )
-                      )
-                    )
-                  )
-                )
+                sortMenu(context.read<ArchiveBloc>(), state.isSortingWindowStateChanging, state.isSortingWindowOpened, state.sortingIndex)
               ]
             )
           );
         }
+      )
+    );
+  }
+
+  Widget sortMenu(ArchiveBloc bloc, bool isSortingWindowStateChanging, bool isSortingWindowOpened, int sortingItemIdex) {
+    return TapRegion(
+      onTapOutside: (tap) => bloc.add(HideSortingWindowEvent()),
+      child: AnimatedOpacity(
+        opacity: isSortingWindowStateChanging ? 1 : 0,
+        onEnd: () => bloc.add(SortingWindowStateChangedEvent()),
+        duration: const Duration(milliseconds: 200),
+        child: Visibility(
+          visible: isSortingWindowOpened,
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Card(
+              child: SizedBox(
+                height: 200,
+                width: 190,
+                child: Column(
+                  children: [
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectAZ, 0, sortingItemIdex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectZA, 1, sortingItemIdex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeAZ, 2, sortingItemIdex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeZA, 3, sortingItemIdex),
+                  ]
+                )
+              )
+            )
+          )
+        )
       )
     );
   }
@@ -141,14 +147,14 @@ class _ArchiveState extends State<Archive> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        const Padding(padding: EdgeInsets.only(right: 10)),
+        dateButton(bloc, fromDate, isLoading, true, isCustomModeEnabled),
+        const Text(' - '),
+        dateButton(bloc, toDate, isLoading, false, isCustomModeEnabled),
         IconButton(
           onPressed: () => _showActionSheet(context, bloc),
           icon: const Icon(Icons.arrow_drop_down)
         ),
-        dateButton(bloc, fromDate, isLoading, true, isCustomModeEnabled),
-        const Text(' - '),
-        dateButton(bloc, toDate, isLoading, false, isCustomModeEnabled),
-        const Padding(padding: EdgeInsets.only(right: 10))
       ]
     );
   }

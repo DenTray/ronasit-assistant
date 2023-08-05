@@ -95,10 +95,9 @@ class ArchiveBloc extends Bloc<BaseArchiveEvent, ArchiveState> {
     });
 
     on<HideSortingWindowEvent>((event, emit) async {
-      emit(state.copyWith(
-        isSortingWindowOpened: false,
-        isSortingWindowStateChanging: false
-      ));
+      if (state.isSortingWindowOpened) {
+        add(SortingButtonClickedEvent());
+      }
     });
 
     on<ApplySortEvent>((event, emit) async {

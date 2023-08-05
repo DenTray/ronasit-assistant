@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
 import '../../../auth/secrets.dart';
 import 'package:ronas_assistant/src/support/helpers.dart';
 import 'package:ronas_assistant/src/models/statistic.dart';
