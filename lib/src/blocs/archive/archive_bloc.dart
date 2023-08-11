@@ -82,10 +82,12 @@ class ArchiveBloc extends Bloc<BaseArchiveEvent, ArchiveState> {
     });
 
     on<SortingButtonClickedEvent>((event, emit) async {
-      emit(state.copyWith(
-        isSortingWindowStateChanging: !state.isSortingWindowStateChanging,
-        isSortingWindowOpened: (!state.isSortingWindowOpened) ? true : state.isSortingWindowOpened
-      ));
+      if (state.isSortingWindowStateChanging == state.isSortingWindowOpened) {
+        emit(state.copyWith(
+            isSortingWindowStateChanging: !state.isSortingWindowStateChanging,
+            isSortingWindowOpened: (!state.isSortingWindowOpened) ? true : state.isSortingWindowOpened
+        ));
+      }
     });
 
     on<SortingWindowStateChangedEvent>((event, emit) async {
@@ -112,8 +114,8 @@ class ArchiveBloc extends Bloc<BaseArchiveEvent, ArchiveState> {
     on<ChooseYesterdayRangeEvent>((event, emit) async {
       emit(state.copyWith(
         isCustomModeEnabled: false,
-        fromDate: DateTime.now().subtract(Duration(days: 1)),
-        toDate: DateTime.now().subtract(Duration(days: 1))
+        fromDate: DateTime.now().subtract(const Duration(days: 1)),
+        toDate: DateTime.now().subtract(const Duration(days: 1))
       ));
 
       add(FetchArchiveEvent());

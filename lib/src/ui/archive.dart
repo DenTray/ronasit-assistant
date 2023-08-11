@@ -72,7 +72,7 @@ class _ArchiveState extends State<Archive> {
     );
   }
 
-  Widget sortMenu(ArchiveBloc bloc, bool isSortingWindowStateChanging, bool isSortingWindowOpened, int sortingItemIdex) {
+  Widget sortMenu(ArchiveBloc bloc, bool isSortingWindowStateChanging, bool isSortingWindowOpened, int sortingItemIndex) {
     return TapRegion(
       onTapOutside: (tap) => bloc.add(HideSortingWindowEvent()),
       child: AnimatedOpacity(
@@ -89,10 +89,10 @@ class _ArchiveState extends State<Archive> {
                 width: 190,
                 child: Column(
                   children: [
-                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectAZ, 0, sortingItemIdex),
-                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectZA, 1, sortingItemIdex),
-                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeAZ, 2, sortingItemIdex),
-                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeZA, 3, sortingItemIdex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectAZ, 0, sortingItemIndex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortProjectZA, 1, sortingItemIndex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeAZ, 2, sortingItemIndex),
+                    sortOption(bloc, AppLocalizations.of(context)!.buttonSortTimeZA, 3, sortingItemIndex),
                   ]
                 )
               )
@@ -163,9 +163,9 @@ class _ArchiveState extends State<Archive> {
     return Expanded(
       child: SingleChildScrollView(
         child: ListView.builder(
-          padding: EdgeInsets.all(15),
+          padding: const EdgeInsets.all(15),
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: statistic.projects.length,
           itemBuilder: (context, index) {
             return Row(
@@ -197,7 +197,7 @@ class _ArchiveState extends State<Archive> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label),
-          Opacity(opacity: (index == currentSortingIndex) ? 1 : 0, child: Icon(Icons.done))
+          Opacity(opacity: (index == currentSortingIndex) ? 1 : 0, child: const Icon(Icons.done))
         ]
       )
     );
