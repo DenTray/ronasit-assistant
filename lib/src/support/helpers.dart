@@ -13,6 +13,10 @@ class Helpers {
       value = int.parse(value);
     }
 
+    if (value.runtimeType == double) {
+      return value.round();
+    }
+
     return value;
   }
 
